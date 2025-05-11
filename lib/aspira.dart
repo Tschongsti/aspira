@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:aspira/screens/start_screen.dart';
 import 'package:aspira/screens/instunkommen_screen.dart';
 import 'package:aspira/screens/fokustracking_screen.dart';
+import 'package:aspira/screens/bestehendefokus_screen.dart';
 
 class Aspira extends StatefulWidget {
   const Aspira({super.key});
@@ -28,6 +29,12 @@ class _Aspira extends State<Aspira> {
     });
   }
 
+  void bestehendeFokus() {
+    setState(() {
+      activeScreen = 'BestehendeFokus-screen';
+    });
+  }
+
   @override
   Widget build(context) {
     Widget screenWidget = StartScreen(startApp);
@@ -38,7 +45,12 @@ class _Aspira extends State<Aspira> {
     }
 
     if (activeScreen == 'FokusTracking-screen') {
-      screenWidget = FokusTrackingScreen(
+      screenWidget = FokusTrackingScreen(bestehendeFokus
+      );
+    }
+
+    if (activeScreen == 'BestehendeFokus-screen') {
+      screenWidget = BestehendeFokusScreen(
       );
     }
 

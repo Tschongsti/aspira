@@ -3,10 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aspira/buttons/button_navigation.dart';
 
-class FokusTrackingScreen extends StatelessWidget{
-  const FokusTrackingScreen (this.bestehendeFokus, {super.key});
-
-  final void Function () bestehendeFokus;
+class BestehendeFokusScreen extends StatelessWidget{
+  const BestehendeFokusScreen ({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +17,7 @@ class FokusTrackingScreen extends StatelessWidget{
               horizontal: 24,
               vertical: 16),
             child: Text(
-              'Fokus Tätigkeiten festlegen',
+              'Bestehende Fokus-Tätigkeiten',
               style: GoogleFonts.inter(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
@@ -45,7 +43,7 @@ class FokusTrackingScreen extends StatelessWidget{
                     ),
                     const SizedBox(height: 30),
                     ButtonNavigation(
-                      onPressed: bestehendeFokus,
+                      onPressed: (){},
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
                       icon: Icons.edit,
