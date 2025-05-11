@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 
-import 'package:aspira/start_screen.dart';
-import 'package:aspira/instunkommen_screen.dart';
+import 'package:aspira/screens/start_screen.dart';
+import 'package:aspira/screens/instunkommen_screen.dart';
+import 'package:aspira/screens/fokustracking_screen.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class Aspira extends StatefulWidget {
+  const Aspira({super.key});
 
   @override
-  State<Home> createState() {
-    return _Home();
+  State<Aspira> createState() {
+    return _Aspira();
   }
 }
 
-class _Home extends State<Home> {
+class _Aspira extends State<Aspira> {
   var activeScreen = 'start-screen';
 
   void startApp() {
@@ -21,12 +22,23 @@ class _Home extends State<Home> {
     });
   }
 
+  void focusTracking() {
+    setState(() {
+      activeScreen = 'FokusTracking-screen';
+    });
+  }
+
   @override
   Widget build(context) {
     Widget screenWidget = StartScreen(startApp);
 
     if (activeScreen == 'InsTunKommen-screen') {
-      screenWidget = InsTunKommenScreen(
+      screenWidget = InsTunKommenScreen(focusTracking
+      );
+    }
+
+    if (activeScreen == 'FokusTracking-screen') {
+      screenWidget = FokusTrackingScreen(
       );
     }
 
@@ -36,8 +48,8 @@ class _Home extends State<Home> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 78, 13, 151),
-                Color.fromARGB(255, 107, 15, 168),
+                Color(0xFFF5F7F8),
+                Color(0xFFF5F7F8),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,

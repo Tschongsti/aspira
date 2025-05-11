@@ -17,16 +17,14 @@ class StartScreen extends StatelessWidget {
             width: 200,
             ),
           SizedBox (height: 16),
-          Text.rich(
-            TextSpan(
-              text: 'Become You',
+          Text(
+              'Become You',
               style: GoogleFonts.inter(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF8D6CCB),
               ),
             ),
-          ),
           SizedBox (height: 16),
           OutlinedButton.icon(
           onPressed: startApp,
