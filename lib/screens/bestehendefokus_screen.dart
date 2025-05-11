@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aspira/buttons/button_navigation.dart';
+import 'package:aspira/data/bestehendefokus_data.dart';
+import 'package:aspira/utils/icon_mapping.dart';
 
 class BestehendeFokusScreen extends StatelessWidget{
   const BestehendeFokusScreen ({super.key});
@@ -26,43 +28,44 @@ class BestehendeFokusScreen extends StatelessWidget{
             ),
           ),
           Expanded(
-            child: Center (
-              child: Padding (
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24
-                  ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:[
-                    ButtonNavigation(
-                      onPressed: (){},
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      icon: Icons.add_circle,
-                      text: 'Neue Fokus-Tätigkeit erfassen'
-                    ),
-                    const SizedBox(height: 30),
-                    ButtonNavigation(
-                      onPressed: (){},
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      icon: Icons.edit,
-                      text: 'Bestehende Fokus-Tätigkeiten verwalten'
-                    ),
-                    const SizedBox(height: 30),
-                    ButtonNavigation(
-                      onPressed: (){},
-                      backgroundColor: Colors.grey,
-                      foregroundColor: Colors.black,
-                      icon: Icons.monitor,
-                      text: 'Auswertung'
-                    ),
-                  ],
-                ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
               ),
+              child: ListView.builder(
+                itemCount: bestehendeFokus.length,
+                itemBuilder: (context, index) {
+                  final eintrag = bestehendeFokus[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: ButtonNavigation(
+                        onPressed: () {}, // später zu "Fokus-Tätigkeit bearbeiten" navigieren
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        icon: getIcon(eintrag.iconName), // oder dynamisch je nach Titel
+                        text: '${eintrag.title}\nStart: ${_formatDate(eintrag.startDate)}\nTotal: ${_formatDuration(eintrag.totalTime)}',
+                      ),
+                    );
+                  },
+                ),
             ),
           ),
         ],
       );
     }
+}
+
+String _formatDate(DateTime date) =>
+    '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+
+String _formatDuration(Duration duration) {
+  final d = duration.inDays;
+  final h = duration.inHours % 24;
+  final m = duration.inMinutes % 60;
+
+  final dayStr = d > 0 ? '${d}d' : '';
+  final hourStr = h > 0 ? '${h}h' : '';
+  final minStr = m > 0 ? '${m}m' : '';
+
+  return [dayStr, hourStr, minStr].where((e) => e.isNotEmpty).join(' ');
 }
