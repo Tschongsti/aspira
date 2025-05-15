@@ -1,27 +1,36 @@
+import 'package:flutter/material.dart';
+
+import 'package:uuid/uuid.dart';
+import 'package:intl/intl.dart';
+import 'package:duration/duration.dart';
+
+final formatter = DateFormat.yMd();
+
+const uuid = Uuid();
+
+enum Status { active, inactive, deleted }
+
 class FokusTaetigkeit {
-  const FokusTaetigkeit(this.title, this.startDate, this.totalTime, this.iconName);
+  FokusTaetigkeit({
+    required this.title,
+    required this.iconName,
+    required this.weeklyGoal,
+    }) : id = uuid.v4();
 
+  final String id;
   final String title;
-  final DateTime startDate;
-  final Duration totalTime;
   final String iconName;
+  final Duration weeklyGoal;
+  var startDate = DateTime.now();
+  var loggedTime = Duration.zero;
+  Status status = Status.active;
 
-/// Factory-Konstruktor für Strings:
-  factory FokusTaetigkeit.fromStrings(String title, String startDate, String totalTime, String iconName) {
-    return FokusTaetigkeit(
-      title,
-      DateTime.parse(startDate), // Format: yyyy-MM-dd
-      _parseDuration(totalTime), // Format: dd:hh:mm
-      iconName,
-    );
+  String get formattedDate {
+    return formatter.format(startDate);
   }
 
-  /// Hilfsmethode zur Umwandlung eines Strings in Duration
-  static Duration _parseDuration(String input) {
-    final parts = input.split(':');
-      final days = parts.length == 3 ? int.tryParse(parts[0]) ?? 0 : 0;
-      final hours = parts.length >= 2 ? int.tryParse(parts[parts.length - 2]) ?? 0 : 0;
-      final minutes = parts.length >= 1 ? int.tryParse(parts[parts.length - 1]) ?? 0 : 0;
-      return Duration(days: days, hours: hours, minutes: minutes);
-    }
+  String get formattedLoggedTime {
+    return prettyDuration(loggedTime);
+  }
+
 }
