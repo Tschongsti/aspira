@@ -20,9 +20,9 @@ class FokustrackingList extends StatelessWidget{
       itemBuilder: (ctx, index) => Dismissible(
         key: ValueKey(fokusTaetigkeiten[index]),
         background: Container(
-          color: Colors.red,
+          color: Colors.red, // noch korrigieren
           margin: EdgeInsets.symmetric(
-            horizontal: 16,
+            horizontal: 16, // noch dynamsich zum Widget anpassen
           ),
         ),
         onDismissed: (direction) {

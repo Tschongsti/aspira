@@ -1,4 +1,5 @@
 import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
+import 'package:aspira/widgets/fokustracking/new_fokustaetigkeit.dart';
 import 'package:flutter/material.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
@@ -17,16 +18,33 @@ class _FokustrackingScreenState extends State<FokustrackingScreen> {
   
     FokusTaetigkeit(
       title: 'berufliches Networking',
-      iconName: 'diversity3',
+      description: 'An Anlässen teilnehmen, LinkedIN Posts kommentieren',
+      iconName: IconName.diversity_3,
       weeklyGoal: Duration(minutes: 120),
     ),
 
     FokusTaetigkeit(
-      title: 'Zeit in der Natur verbringen',
-      iconName: 'landscape2',
+      title: 'Zeit in der Natur',
+      description: 'Spazieren im Park oder Wald',
+      iconName: IconName.landscape,
       weeklyGoal: Duration(minutes: 240),
     ),
   ];
+
+  void _openAddFokustaetigkeit () {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      context: context, 
+      builder: (ctx) => NewFokustaetigkeit(onAddFokustaetigkeit: _addFokustaetigkeit),
+    );
+  }
+
+  void _addFokustaetigkeit(FokusTaetigkeit fokusTaetigkeit) {
+  setState(() {
+    _registeredFokusTaetigkeit.add(fokusTaetigkeit);
+  });  
+}
 
   void _removeFokustaetigkeit(FokusTaetigkeit fokusTaetigkeit) {
     final fokusTaetigkeitIndex = _registeredFokusTaetigkeit.indexOf(fokusTaetigkeit);
@@ -77,7 +95,7 @@ class _FokustrackingScreenState extends State<FokustrackingScreen> {
               icon: const Icon(Icons.help),
             ),
             IconButton(
-              onPressed: (){},
+              onPressed: _openAddFokustaetigkeit,
               icon: const Icon(Icons.add),
             ), 
           ],
