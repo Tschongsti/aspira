@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:duration/duration.dart';
 
-final formatter = DateFormat.yMd();
+final formatter = DateFormat('dd.MM.yyyy');
 
 const uuid = Uuid();
 
@@ -40,7 +40,18 @@ class FokusTaetigkeit {
   }
 
   String get formattedLoggedTime {
-    return prettyDuration(loggedTime);
+    return prettyDuration(
+      loggedTime,
+      abbreviated: true,               // z. B. 1d 2h 3m
+      tersity: DurationTersity.minute, // bis zur Minute (keine Sekunden)
+      spacer: '',                      // kein Leerzeichen zwischen Einheit & Zahl
+      delimiter: '',
+      // abbreviations: {
+      //  DurationTersity.day: 'd',
+      //  DurationTersity.hour: 'h',
+      //  DurationTersity.minute: 'm',
+      //  }                   
+    );
   }
 
 }

@@ -15,28 +15,35 @@ final FokusTaetigkeit fokusTaetigkeiten;
           horizontal: 20,
           vertical: 16,
           ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row (
           children: [
-           Text(
-            fokusTaetigkeiten.title,
+            Icon (
+              categoryIcons[fokusTaetigkeiten.iconName],
+              size: 40,
             ),
-           // const SizedBox (height: 4),
-           //Row(
-           // children: [
-           //   Text('\$${expense.amount.toStringAsFixed(2)}'), // 12.3433 --> 12.34
-           //   const Spacer(),
-           //   Row(
-           //     children: [
-           //       Icon(categoryIcons[expense.category]),
-           //       const SizedBox(width: 8),
-           //       Text(expense.formattedDate),
-           //     ],
-           //   ),
-            ],
-           ),
-           // ],
+            SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fokusTaetigkeiten.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox (height: 6),
+                Text (
+                  fokusTaetigkeiten.formattedDate,
+                ),
+                const SizedBox (height: 4),
+                Text (
+                  fokusTaetigkeiten.formattedLoggedTime,
+                )
+              ],
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }

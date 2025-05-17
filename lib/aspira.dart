@@ -4,6 +4,14 @@ import 'package:aspira/screens/start_screen.dart';
 import 'package:aspira/screens/instunkommen_screen.dart';
 import 'package:aspira/widgets/fokustracking/fokustracking.dart';
 
+var kColorScheme = ColorScheme.fromSeed(
+  seedColor: const Color(0XFF8D6CCB),
+);
+
+var kDarkColorScheme = ColorScheme.fromSeed(
+  brightness: Brightness.dark,
+  seedColor: const Color(0xFFBCA7E6),
+);
 
 class Aspira extends StatefulWidget {
   const Aspira({super.key});
@@ -44,19 +52,15 @@ class _Aspira extends State<Aspira> {
     }
 
     return MaterialApp(
+      theme: ThemeData().copyWith(
+        colorScheme: kColorScheme,
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        colorScheme: kDarkColorScheme,
+      ),
       home: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFF5F7F8),
-                Color(0xFFF5F7F8),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: screenWidget,
+        child: screenWidget,
         ),
       ),
     );
