@@ -19,22 +19,41 @@ class _NewFokustaetigkeitState extends State<NewFokustaetigkeit> {
   final _weeklyGoalController = TextEditingController();
   IconName _selectedIconName = IconName.favorite;
 
+void _showDialog () {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Ungültige Eingabe'),
+          content: const Text('Bitte stelle sicher, dass Titel und Wochenziel gültig sind.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('Okay'),
+              ),
+          ],
+        ),
+      );
+  }
+
 void _submitTaetigkeitData () {
-    // final enteredAmount = double.tryParse(_amountController.text); // tryParse('Hello') => null, tryParse('1.13') => 1.13
-    //final amountIsInvalid = enteredAmount == null || enteredAmount <=0; // && = AND, || = OR
-    // if(_titleController.text.trim().isEmpty ||
-    //  amountIsInvalid ||
-    //  _selectedDate == null) { 
-    //  _showDialog();
-    //  return;
-    //  }
+    final enteredWeeklyGoal = double.tryParse(_weeklyGoalController.text); // tryParse('Hello') => null, tryParse('1.13') => 1.13
+    final weeklyGoalIsInvalid = enteredWeeklyGoal == null || enteredWeeklyGoal <=0; // && = AND, || = OR
+      if(
+        _titleController.text.trim().isEmpty ||
+        weeklyGoalIsInvalid
+        ) { 
+      _showDialog();
+      return;
+     }
     
     widget.onAddFokustaetigkeit(  
       FokusTaetigkeit(    
         title: _titleController.text,
         description: _descriptionController.text,
         iconName: _selectedIconName,
-        weeklyGoal: Duration(minutes: _weeklyGoalController.hashCode),
+        weeklyGoal: Duration(minutes: enteredWeeklyGoal.round()),
       ),
     );
     Navigator.pop(context);
