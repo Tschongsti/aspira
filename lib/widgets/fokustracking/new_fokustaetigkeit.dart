@@ -130,7 +130,7 @@ void _submitTaetigkeitData () {
                     ),
                   ],
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(height: 16),
                 Row(
                   children:[
                     const Spacer(),

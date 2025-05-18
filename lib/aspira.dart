@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aspira/screens/start_screen.dart';
 import 'package:aspira/screens/instunkommen_screen.dart';
@@ -54,6 +55,12 @@ class _Aspira extends State<Aspira> {
     return MaterialApp(
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
+        textTheme: GoogleFonts.interTextTheme(),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kColorScheme.primaryContainer,
+          ),
+        ),
       ),
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
