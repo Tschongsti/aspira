@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aspira/widgets/button_navigation.dart';
 
 class InsTunKommenScreen extends StatelessWidget{
-  const InsTunKommenScreen (this.focusTracking, {super.key});
-
-  final void Function () focusTracking;
+  const InsTunKommenScreen ({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,9 @@ class InsTunKommenScreen extends StatelessWidget{
                     ),
                     const SizedBox(height: 30),
                     ButtonNavigation(
-                      onPressed: focusTracking,
+                      onPressed: () {
+                        context.push('/ins-tun/fokus');
+                      },
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
                       icon: Icons.search,

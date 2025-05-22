@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:aspira/screens/start_screen.dart';
+import 'package:aspira/router/app_router.dart';
 
 var kColorScheme = ColorScheme.fromSeed(
   seedColor: const Color(0XFF8D6CCB),
@@ -33,7 +33,7 @@ class AspiraApp extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return MaterialApp(
+    return MaterialApp.router(
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
         textTheme: GoogleFonts.interTextTheme(),
@@ -42,11 +42,16 @@ class AspiraApp extends StatelessWidget {
             backgroundColor: kColorScheme.primaryContainer,
           ),
         ),
-      ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: kColorScheme.primary,
+          selectedItemColor: kColorScheme.onPrimary,
+          unselectedItemColor: kColorScheme.onSecondary,
+          ),
+        ),
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
       ),
-      home: StartScreen(),
+      routerConfig: appRouter,
     );
   }
 }

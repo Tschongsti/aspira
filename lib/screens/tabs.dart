@@ -1,55 +1,67 @@
+import 'package:aspira/main.dart';
 import 'package:flutter/material.dart';
 
-import 'package:aspira/screens/fokustracking_screen.dart';
-import 'package:aspira/screens/home_screen.dart';
+import 'package:go_router/go_router.dart';
 
+class TabsScreen extends StatelessWidget {
+  const TabsScreen({super.key, required this.child});
+  
+  final Widget child;
 
+  int _locationToIndex(String location) {
+  if (location.startsWith('/home')) return 0;
+  if (location.startsWith('/effektivitaet')) return 1;
+  if (location.startsWith('/effizienz')) return 2;
+  if (location.startsWith('/ins-tun')) return 3;
+  return 0;
+  }
 
-class TabsScreen extends StatefulWidget {
-  const TabsScreen ({super.key});
+void _onTap(int index, BuildContext context) {
+  switch (index) {
+    case 0:
+      context.go('/home');
+      break;
+    case 1:
+      context.go('/effektivitaet');
+      break;
+    case 2:
+      context.go('/effizienz');
+      break;
+    case 3:
+      context.go('/ins-tun');
+      break;
+  }
+}  
 
   @override
-  State<TabsScreen> createState() {
-    return _TabsScreenState();
-  }
-}
-
-class _TabsScreenState extends State<TabsScreen> {
-  int _selectedPageIndex = 0;
-
-void _selectPage(int index) {
-    setState(() {
-      _selectedPageIndex = index;
-    });
-  }
-
-@override
   Widget build(BuildContext context) {
-
-    Widget activePage = HomeScreen();
-    var activePageTitle = 'Home';
-
-    if (_selectedPageIndex == 1) {
-      activePage = FokustrackingScreen();
-      activePageTitle = 'Fokus-Tätigkeiten';
-    }
-
+    final location = GoRouterState.of(context).uri.toString();
+    final selectedIndex = _locationToIndex(location);
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(activePageTitle),
+        title: Text(['Home', 'Die richtigen Dinge tun', 'Die Dinge richtig tun', 'Ins Tun kommen'][selectedIndex]),
       ),
-      body: activePage,
+      body: child,
       bottomNavigationBar: BottomNavigationBar(
-        onTap: _selectPage,
-        currentIndex: _selectedPageIndex, // highlights the selected page
+        onTap: (index) => _onTap(index, context),
+        currentIndex: selectedIndex, // highlights the selected page
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Fokus-Tätigkeiten',
+            icon: Icon(Icons.track_changes),
+            label: 'Effektivität',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: 'Effizienz',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_run),
+            label: 'Ins Tun',
           )
         ],
       ),

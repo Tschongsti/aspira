@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:aspira/screens/tabs.dart';
+import 'package:go_router/go_router.dart';
 
 class StartScreen extends StatelessWidget {
     const StartScreen ({super.key});
@@ -29,11 +29,7 @@ class StartScreen extends StatelessWidget {
           SizedBox (height: 16),
           OutlinedButton.icon(
             onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (ctx) => TabsScreen(),
-                ),
-              );
+              context.go('/home');
             },          
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.black,

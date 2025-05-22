@@ -84,10 +84,6 @@ class _FokustrackingScreenState extends State<FokustrackingScreen> {
 
       return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            onPressed: (){},
-            icon: const Icon(Icons.arrow_back),
-          ),
           title: Text ('Fokus Tätigkeiten'),
           actions: [
             IconButton(
