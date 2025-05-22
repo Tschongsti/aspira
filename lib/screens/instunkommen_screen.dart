@@ -38,7 +38,9 @@ class InsTunKommenScreen extends StatelessWidget{
                   mainAxisAlignment: MainAxisAlignment.center,
                   children:[
                     ButtonNavigation(
-                      onPressed: (){},
+                      onPressed: (){
+                        context.push('/ins-tun/gewohnheit');
+                      },
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
                       icon: Icons.repeat,
@@ -56,7 +58,9 @@ class InsTunKommenScreen extends StatelessWidget{
                     ),
                     const SizedBox(height: 30),
                     ButtonNavigation(
-                      onPressed: (){},
+                      onPressed: (){
+                        context.push('/ins-tun/schlaf');
+                      },
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
                       icon: Icons.hotel,

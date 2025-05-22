@@ -5,6 +5,8 @@ class SchlaftrackingScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Text ('SchlaftrackingScreen');
+    return Center(
+      child: Text ('SchlaftrackingScreen'),
+      );
   }
 }

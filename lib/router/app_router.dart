@@ -43,7 +43,7 @@ final appRouter = GoRouter(
               builder: (context, state) => const FokustrackingScreen(),
             ),
             GoRoute(
-              path: 'gewohnheiten',
+              path: 'gewohnheit',
               builder: (context, state) => const GewohnheitstrackingScreen(),
             ),
             GoRoute(

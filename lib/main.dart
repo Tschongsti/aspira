@@ -4,11 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:aspira/utils/styling_theme.dart';
 import 'package:aspira/router/app_router.dart';
 
-var kColorScheme = ColorScheme.fromSeed(
-  seedColor: const Color(0XFF8D6CCB),
-);
 
 var kDarkColorScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
@@ -37,16 +35,13 @@ class AspiraApp extends StatelessWidget {
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
         textTheme: GoogleFonts.interTextTheme(),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: kColorScheme.primaryContainer,
-          ),
-        ),
+        scaffoldBackgroundColor: kColorScheme.surface,
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: kColorScheme.primary,
           selectedItemColor: kColorScheme.onPrimary,
-          unselectedItemColor: kColorScheme.onSecondary,
-          ),
+          unselectedItemColor: kColorScheme.onPrimary.withAlpha(120),
+          type: BottomNavigationBarType.fixed
+        ),
         ),
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,

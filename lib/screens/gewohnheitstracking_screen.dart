@@ -5,6 +5,8 @@ class GewohnheitstrackingScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Text ('GewohnheitstrackingScreen');
+    return Center(
+      child: Text ('GewohnheitstrackingScreen'),
+      );
   }
 }

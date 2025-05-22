@@ -5,6 +5,8 @@ class EffizienzScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Text ('Die Dinge richtig tun Screen');
+    return Center(
+      child: Text ('Die Dinge richtig tun Screen'),
+      );
   }
 }
