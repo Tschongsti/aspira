@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aspira/screens/start_screen.dart';
-import 'package:aspira/screens/tabs.dart';
 
 var kColorScheme = ColorScheme.fromSeed(
   seedColor: const Color(0XFF8D6CCB),
@@ -29,32 +28,11 @@ void main() {
   });
 }
 
-class AspiraApp extends StatefulWidget {
+class AspiraApp extends StatelessWidget {
   const AspiraApp({super.key});
 
   @override
-  State<AspiraApp> createState() {
-    return _AspiraAppState();
-  }
-}
-
-class _AspiraAppState extends State<AspiraApp> {
-  var activeScreen = 'start-screen';
-
-  void startApp() {
-    setState(() {
-      activeScreen = 'tabs-screen';
-    });
-  }
-
-  @override
   Widget build(context) {
-    Widget screenWidget = StartScreen(startApp);
-
-    if (activeScreen == 'tabs-screen') {
-      screenWidget = const TabsScreen();
-    }
-
     return MaterialApp(
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
@@ -68,7 +46,7 @@ class _AspiraAppState extends State<AspiraApp> {
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
       ),
-      home: screenWidget,
+      home: StartScreen(),
     );
   }
 }
