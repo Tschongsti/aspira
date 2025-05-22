@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:aspira/buttons/button_navigation.dart';
+import 'package:aspira/widgets/button_navigation.dart';
 
 class InsTunKommenScreen extends StatelessWidget{
   const InsTunKommenScreen (this.focusTracking, {super.key});

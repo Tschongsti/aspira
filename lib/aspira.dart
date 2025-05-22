@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aspira/screens/start_screen.dart';
-import 'package:aspira/screens/instunkommen_screen.dart';
-import 'package:aspira/widgets/fokustracking/fokustracking.dart';
+import 'package:aspira/screens/tabs.dart';
 
 var kColorScheme = ColorScheme.fromSeed(
   seedColor: const Color(0XFF8D6CCB),
@@ -28,13 +27,7 @@ class _Aspira extends State<Aspira> {
 
   void startApp() {
     setState(() {
-      activeScreen = 'InsTunKommen-screen';
-    });
-  }
-
-  void focusTracking() {
-    setState(() {
-      activeScreen = 'FokusTracking-screen';
+      activeScreen = 'tabs-screen';
     });
   }
 
@@ -42,14 +35,8 @@ class _Aspira extends State<Aspira> {
   Widget build(context) {
     Widget screenWidget = StartScreen(startApp);
 
-    if (activeScreen == 'InsTunKommen-screen') {
-      screenWidget = InsTunKommenScreen(focusTracking
-      );
-    }
-
-    if (activeScreen == 'FokusTracking-screen') {
-      screenWidget = FokustrackingScreen(
-      );
+    if (activeScreen == 'tabs-screen') {
+      screenWidget = const TabsScreen();
     }
 
     return MaterialApp(
@@ -65,11 +52,7 @@ class _Aspira extends State<Aspira> {
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
       ),
-      home: Scaffold(
-        body: Container(
-        child: screenWidget,
-        ),
-      ),
+      home: screenWidget,
     );
   }
 }

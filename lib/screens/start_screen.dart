@@ -1,3 +1,4 @@
+import 'package:aspira/screens/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -27,18 +28,24 @@ class StartScreen extends StatelessWidget {
             ),
           SizedBox (height: 16),
           OutlinedButton.icon(
-          onPressed: startApp,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.black,
-            backgroundColor: Color(0xFF8D6CCB),
-            padding: EdgeInsets.symmetric(
-              vertical: 16,
-              horizontal: 72,
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (ctx) => TabsScreen(),
+                ),
+              );
+            },          
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.black,
+              backgroundColor: Color(0xFF8D6CCB),
+              padding: EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 72,
+              ),
+              side: BorderSide.none,
             ),
-            side: BorderSide.none,
-          ),
-          icon: const Icon(Icons.start),
-          label: const Text('Start App'),
+            icon: const Icon(Icons.start),
+            label: const Text('Start App'),
           ),
         ],
       ),
