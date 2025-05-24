@@ -14,20 +14,6 @@ class InsTunKommenScreen extends StatelessWidget{
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height:40),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 16),
-            child: Text(
-              'Ins Tun kommen',
-              style: GoogleFonts.inter(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF8D6CCB),
-              ),
-            ),
-          ),
           Expanded(
             child: Center (
               child: Padding (
