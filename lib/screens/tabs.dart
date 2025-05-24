@@ -40,6 +40,13 @@ void _onTap(int index, BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(['Home', 'Die richtigen Dinge tun', 'Die Dinge richtig tun', 'Ins Tun kommen'][selectedIndex]),
+        actions: [
+          if (selectedIndex == 0)
+            IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () => context.push('/profile'),
+            ),
+        ],
       ),
       body: child,
       bottomNavigationBar: BottomNavigationBar(

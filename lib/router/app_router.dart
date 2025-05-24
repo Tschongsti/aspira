@@ -1,3 +1,4 @@
+import 'package:aspira/screens/benachrichtigungen_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/screens/start_screen.dart';
@@ -36,27 +37,29 @@ final appRouter = GoRouter(
         ),
         GoRoute(
           path: '/ins-tun',
-          builder: (context, state) => const InsTunKommenScreen(),
-          routes: [
-            GoRoute(
-              path: 'fokus',
-              builder: (context, state) => const FokustrackingScreen(),
-            ),
-            GoRoute(
-              path: 'gewohnheit',
-              builder: (context, state) => const GewohnheitstrackingScreen(),
-            ),
-            GoRoute(
-              path: 'schlaf',
-              builder: (context, state) => const SchlaftrackingScreen(),
-            ),
-            ],
-          ),
-          GoRoute(
-          path: '/profile',
-          builder: (context, state) => const ProfileScreen(),
+          builder: (context, state) => const InsTunKommenScreen()
         ),
       ],
     ),
+    GoRoute(
+      path: '/ins-tun/fokus',
+      builder: (context, state) => const FokustrackingScreen(),
+    ),
+    GoRoute(
+      path: '/ins-tun/gewohnheit',
+      builder: (context, state) => const GewohnheitstrackingScreen(),
+    ),
+    GoRoute(
+      path: '/ins-tun/schlaf',
+      builder: (context, state) => const SchlaftrackingScreen(),
+    ),
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: '/profile/notifications',
+      builder: (context, state) => const BenachrichtigungenScreen(),
+    )
   ],
 );
