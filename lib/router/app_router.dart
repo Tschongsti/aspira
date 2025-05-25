@@ -46,7 +46,7 @@ final appRouter = GoRouter(
         ),
         GoRoute(
           path: '/ins-tun',
-          builder: (context, state) => const InsTunKommenScreen()
+          builder: (context, state) => const InsTunKommenScreen(),
         ),
       ],
     ),

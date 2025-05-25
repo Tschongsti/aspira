@@ -2,6 +2,8 @@ import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
 import 'package:aspira/widgets/fokustracking/new_fokustaetigkeit.dart';
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
+
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 
 class FokustrackingScreen extends StatefulWidget{
@@ -13,7 +15,7 @@ class FokustrackingScreen extends StatefulWidget{
   }
 }
 
-class _FokustrackingScreenState extends State<FokustrackingScreen> {
+class _FokustrackingScreenState extends State<FokustrackingScreen> with TickerProviderStateMixin {
   final List<FokusTaetigkeit> _registeredFokusTaetigkeit = [
   
     FokusTaetigkeit(
@@ -31,11 +33,15 @@ class _FokustrackingScreenState extends State<FokustrackingScreen> {
     ),
   ];
 
-  void _openAddFokustaetigkeit () {
+  Future<void> _openAddFokustaetigkeit () async {
+    final controller = BottomSheet.createAnimationController(this)
+      ..duration = const Duration (milliseconds: 1000);
+    
     showModalBottomSheet(
       useSafeArea: true,
       isScrollControlled: true,
       context: context, 
+      transitionAnimationController: controller,
       builder: (ctx) => NewFokustaetigkeit(onAddFokustaetigkeit: _addFokustaetigkeit),
     );
   }
