@@ -1,12 +1,12 @@
-import 'package:aspira/utils/appscaffold.dart';
-import 'package:aspira/utils/appscreenconfig.dart';
-import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
-import 'package:aspira/widgets/fokustracking/new_fokustaetigkeit.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/appscreenconfig.dart';
+import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
+import 'package:aspira/widgets/fokustracking/new_fokustaetigkeit.dart';
 
 class FokustrackingScreen extends StatefulWidget{
   const FokustrackingScreen ({super.key});

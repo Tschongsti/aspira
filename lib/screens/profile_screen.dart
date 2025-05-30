@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/appscreenconfig.dart';
+
 class ProfileScreen extends StatelessWidget{
   const ProfileScreen ({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text ('Profil'),
-      ),
-      body: OutlinedButton.icon(
+  final config = AppScreenConfig(
+    title: 'Mein Profil');
+
+    return AppScaffold(
+      config: config,
+      child: OutlinedButton.icon(
         onPressed: () {
           context.push('/profile/notifications');
         },          
