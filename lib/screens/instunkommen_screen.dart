@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/widgets/button_navigation.dart';
 
 class InsTunKommenScreen extends StatelessWidget{
@@ -9,7 +11,12 @@ class InsTunKommenScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final config = AppScreenConfig(
+      title: 'Ins Tun Kommen');
+    
+    return AppScaffold(
+      config: config,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
@@ -56,6 +63,7 @@ class InsTunKommenScreen extends StatelessWidget{
             ),
           ),
         ],
-      );
-    }
+      ),
+    );
+  }
 }
