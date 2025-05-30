@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import 'package:aspira/providers/firstvisit_provider.dart';
 import 'package:aspira/screens/start_screen.dart';
-import 'package:aspira/screens/tabs.dart';
 import 'package:aspira/screens/home_screen.dart';
 import 'package:aspira/screens/effektivitaet_screen.dart';
 import 'package:aspira/screens/effizienz_screen.dart';
@@ -14,6 +13,7 @@ import 'package:aspira/screens/benachrichtigungen_screen.dart';
 import 'package:aspira/screens/instunkommen_screen.dart';
 import 'package:aspira/screens/fokustracking_intro_screen.dart';
 import 'package:aspira/screens/fokustracking_screen.dart';
+import 'package:aspira/screens/fokustracking_new_item.dart';
 import 'package:aspira/screens/gewohnheitstracking_screen.dart';
 import 'package:aspira/screens/schlaftracking_screen.dart';
 
@@ -55,6 +55,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/ins-tun/fokus/intro',
       builder: (context, state) => const FokustrackingIntroScreen(),
+    ),
+    GoRoute(
+      path: '/ins-tun/fokus/new',
+      builder: (context, state) => const NewFokustaetigkeitScreen(),
     ),
     GoRoute(
       path: '/ins-tun/gewohnheit',
