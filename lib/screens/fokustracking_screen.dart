@@ -1,3 +1,5 @@
+import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
 import 'package:aspira/widgets/fokustracking/new_fokustaetigkeit.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +78,20 @@ class _FokustrackingScreenState extends State<FokustrackingScreen> with TickerPr
 
   @override
     Widget build(BuildContext context) {
+      final config = AppScreenConfig(
+        title: 'Fokus Tätigkeiten',
+        appBarActions: [
+          IconButton(
+              onPressed: () {
+                context.push('/ins-tun/fokus/intro');
+              },
+              icon: const Icon(Icons.help),
+            ),
+            IconButton(
+              onPressed: _openAddFokustaetigkeit,
+              icon: const Icon(Icons.add),
+            ), 
+        ]);
 
       Widget mainContent = const Center(
       child: Text('Keine Fokus-Tätigkeiten gefunden. Bitte füge eine hinzu!'),
@@ -88,21 +104,9 @@ class _FokustrackingScreenState extends State<FokustrackingScreen> with TickerPr
             );
     }
 
-      return Scaffold(
-        appBar: AppBar(
-          title: Text ('Fokus Tätigkeiten'),
-          actions: [
-            IconButton(
-              onPressed: (){},
-              icon: const Icon(Icons.help),
-            ),
-            IconButton(
-              onPressed: _openAddFokustaetigkeit,
-              icon: const Icon(Icons.add),
-            ), 
-          ],
-        ),
-        body: Column(
+      return AppScaffold (
+        config: config,
+        child: Column(
           children: [
             Expanded(
               child: mainContent,

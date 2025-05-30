@@ -4,17 +4,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/providers/firstvisit_provider.dart';
+import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/appscreenconfig.dart';
 
 class FokustrackingIntroScreen extends ConsumerWidget {
   const FokustrackingIntroScreen ({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text ('Fokustätigkeit Intro'),
-      ),
-      body: OutlinedButton.icon(
+    final config = AppScreenConfig(
+      title: 'Fokustätigkeit Intro',
+      showBottomNav: false,
+      );
+    
+    return AppScaffold(
+      config: config,
+      child: OutlinedButton.icon(
         onPressed: () {
           ref.read(firstVisitProvider.notifier).markVisited('fokus');
           context.go('/ins-tun/fokus');
