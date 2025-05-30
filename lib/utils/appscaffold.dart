@@ -44,6 +44,7 @@ class AppScaffold extends StatelessWidget {
       appBar: config.showAppBar
           ? AppBar(
               title: Text(config.title),
+              leading: config.leading,
               actions: config.appBarActions,
             )
           : null,

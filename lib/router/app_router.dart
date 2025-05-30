@@ -29,26 +29,21 @@ final appRouter = GoRouter(
       path: '/start',
       builder: (context, state) => const StartScreen(),
     ),
-    ShellRoute(
-      builder: (context, state, child) => TabsScreen(child: child),
-      routes: [
-        GoRoute(
-          path: '/home',
-          builder: (context, state) => const HomeScreen(),
-        ),
-        GoRoute(
-          path: '/effektivitaet',
-          builder: (context, state) => const EffektivitaetScreen(),
-        ),
-        GoRoute(
-          path: '/effizienz',
-          builder: (context, state) => const EffizienzScreen(),
-        ),
-        GoRoute(
-          path: '/ins-tun',
-          builder: (context, state) => const InsTunKommenScreen(),
-        ),
-      ],
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/effektivitaet',
+      builder: (context, state) => const EffektivitaetScreen(),
+    ),
+    GoRoute(
+      path: '/effizienz',
+      builder: (context, state) => const EffizienzScreen(),
+    ),
+    GoRoute(
+      path: '/ins-tun',
+      builder: (context, state) => const InsTunKommenScreen(),
     ),
     GoRoute(
       path: '/ins-tun/fokus',
