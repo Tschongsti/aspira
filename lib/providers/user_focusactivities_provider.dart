@@ -54,7 +54,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
   void addFokusTaetigkeit(FokusTaetigkeit fokus) async {   
     
     final db = await _getDatabase();
-    db.insert('user_focusactivities', {
+    await db.insert('user_focusactivities', {
       'id': fokus.id,
       'title': fokus.title,
       'description': fokus.description,
@@ -68,11 +68,36 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     state = [fokus, ...state]; // new FokusTätigkeit is always at the start of the list
   }
 
-  void remove(FokusTaetigkeit fokus) {
+  void remove(FokusTaetigkeit fokus) async {
+    
+    final db = await _getDatabase();
+    await db.delete(
+      'user_focusactivities',
+      where: 'id = ?',
+      whereArgs: [fokus.id],
+    );
+    
     state = [...state]..remove(fokus);
   }
 
-  void insertAt(int index, FokusTaetigkeit fokus) {
+  void insertAt(int index, FokusTaetigkeit fokus) async {
+    
+    final db = await _getDatabase();
+    await db.insert(
+      'user_focusactivities',
+      {
+        'id': fokus.id,
+        'title': fokus.title,
+        'description': fokus.description,
+        'iconName': fokus.iconName.name,
+        'weeklyGoal': fokus.weeklyGoal.inMinutes,
+        'startDate': fokus.startDate.toIso8601String(),
+        'loggedTime': fokus.loggedTime.inMinutes,
+        'status': fokus.status.name,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );    
+    
     final newList = [...state];
     newList.insert(index, fokus);
     state = newList;
