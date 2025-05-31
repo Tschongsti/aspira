@@ -1,39 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:path_provider/path_provider.dart' as syspaths;
-import 'package:path/path.dart' as path;
-import 'package:sqflite/sqflite.dart'as sql;
 import 'package:sqflite/sqlite_api.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/data/database.dart';
 
-Future<Database> _getDatabase() async {
-  final dbPath = await sql.getDatabasesPath();
-    final db = await sql.openDatabase(
-      path.join(dbPath, 'focusactivities.db'),
-      onCreate: (db, version) {
-        return db.execute('''
-          CREATE TABLE user_focusactivities(
-            id TEXT PRIMARY KEY,
-            title TEXT,
-            description TEXT,
-            iconName TEXT,
-            weeklyGoal INTEGER,
-            startDate TEXT,
-            loggedTime INTEGER,
-            status TEXT)
-            ''');
-      },
-      version: 1,
-    );
-  return db;
-}
 
 class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
   UserFokusActivitiesNotifier() : super(const []);
 
   Future<void> loadFocusActivities() async {
-    final db = await _getDatabase();
+    final db = await getDatabase();
     final data = await db.query('user_focusactivities');
     final focusactivities = data.map(
       (row) => FokusTaetigkeit(
@@ -53,7 +30,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
   void addFokusTaetigkeit(FokusTaetigkeit fokus) async {   
     
-    final db = await _getDatabase();
+    final db = await getDatabase();
     await db.insert('user_focusactivities', {
       'id': fokus.id,
       'title': fokus.title,
@@ -70,7 +47,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
   void remove(FokusTaetigkeit fokus) async {
     
-    final db = await _getDatabase();
+    final db = await getDatabase();
     await db.delete(
       'user_focusactivities',
       where: 'id = ?',
@@ -82,7 +59,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
   void insertAt(int index, FokusTaetigkeit fokus) async {
     
-    final db = await _getDatabase();
+    final db = await getDatabase();
     await db.insert(
       'user_focusactivities',
       {
