@@ -8,11 +8,26 @@ import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
 
-class FokustrackingScreen extends ConsumerWidget {
+class FokustrackingScreen extends ConsumerStatefulWidget {
   const FokustrackingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _FokustrackingScreenState();
+  }
+}
+
+class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> { 
+  late Future<void> _focusactivitiesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusactivitiesFuture = ref.read(userFokusActivitiesProvider.notifier).loadFocusActivities();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final fokusTaetigkeiten = ref.watch(userFokusActivitiesProvider);
 
     final config = AppScreenConfig(
@@ -65,10 +80,16 @@ class FokustrackingScreen extends ConsumerWidget {
 
     return AppScaffold(
       config: config,
-      child: Column(
-        children: [
-          Expanded(child: mainContent),
-        ],
+      child: FutureBuilder(
+        future: _focusactivitiesFuture,
+        builder: (context, snapshot) =>
+          snapshot.connectionState == ConnectionState.waiting
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  Expanded(child: mainContent),
+                ],
+              ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
@@ -41,6 +42,19 @@ class _NewFokustaetigkeitScreenState extends ConsumerState<NewFokustaetigkeitScr
     // if (!mounted) return;
     Navigator.of(context).pop();
   }
+
+  //void _pickIcon() async {
+  //  IconData? icon = await IconPicker.showPicker(
+  //    context,
+  //    iconPackModes: [IconPack.material],
+  //  );
+
+  //  if (icon != null) {
+  //    setState(() {
+  //      _selectedIcon = icon;
+  //    });
+  //  }
+  //}
 
   @override
   Widget build(BuildContext context) {

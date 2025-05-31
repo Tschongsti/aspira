@@ -24,16 +24,24 @@ class FokusTaetigkeit {
     required this.description,
     required this.iconName,
     required this.weeklyGoal,
-    }) : id = uuid.v4();
+    String? id,
+    DateTime? startDate,
+    Duration? loggedTime,
+    Status? status,
+    }) : 
+    id = id ?? uuid.v4(),
+    startDate = startDate ?? DateTime.now(),
+    loggedTime = loggedTime ?? Duration.zero,
+    status = status ?? Status.active;
 
   final String id;
   final String title;
   final String description;
   final IconName iconName;
   final Duration weeklyGoal;
-  var startDate = DateTime.now();
-  var loggedTime = Duration.zero;
-  Status status = Status.active;
+  final DateTime startDate;
+  final Duration loggedTime;
+  final Status status;
 
   String get formattedDate {
     return formatter.format(startDate);
