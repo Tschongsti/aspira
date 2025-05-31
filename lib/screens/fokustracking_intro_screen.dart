@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 
-import 'package:aspira/providers/firstvisit_provider.dart';
+import 'package:aspira/providers/visited_screens_provider.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 
@@ -12,6 +12,16 @@ class FokustrackingIntroScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final visited = ref.watch(visitedScreensProvider);
+
+    // Falls bereits besucht -> sofortige Weiterleitung
+    if (visited.contains('fokus')) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/ins-tun/fokus');
+      });
+      return const SizedBox.shrink(); // zeigt „nichts“, vermeidet Flackern
+    }
+      
     final config = AppScreenConfig(
       title: 'Fokustätigkeit Intro',
       showBottomNav: false,
@@ -20,9 +30,11 @@ class FokustrackingIntroScreen extends ConsumerWidget {
     return AppScaffold(
       config: config,
       child: OutlinedButton.icon(
-        onPressed: () {
-          ref.read(firstVisitProvider.notifier).markVisited('fokus');
-          context.go('/ins-tun/fokus');
+        onPressed: () async {
+          await ref.read(visitedScreensProvider.notifier).markVisited('fokus');
+          if (context.mounted) {
+            context.go('/ins-tun/fokus');
+          }
         },          
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.black,

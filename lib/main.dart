@@ -13,24 +13,30 @@ var kDarkColorScheme = ColorScheme.fromSeed(
   seedColor: const Color(0xFFBCA7E6),
 );
 
+final container = ProviderContainer();
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((fn) {
   runApp(
-    const ProviderScope(
-      child: AspiraApp(),
+    UncontrolledProviderScope(
+      container: container,
+      child: ProviderScope(
+        child: AspiraApp(),
+      ),
     ),
   );
   });
 }
 
-class AspiraApp extends StatelessWidget {
+class AspiraApp extends ConsumerWidget {
   const AspiraApp({super.key});
 
   @override
-  Widget build(context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router =ref.watch(appRouterProvider);
     return MaterialApp.router(
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
@@ -46,7 +52,7 @@ class AspiraApp extends StatelessWidget {
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
       ),
-      routerConfig: appRouter,
+      routerConfig: router,
     );
   }
 }
