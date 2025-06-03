@@ -27,11 +27,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/splash',
     refreshListenable: routerNotifier,
     redirect: (context, state) {
+      
       final user = FirebaseAuth.instance.currentUser;
       final isLoggedIn = user != null;
+      
+      if (state.uri.toString() == '/splash') {
+        final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+        return isLoggedIn ? '/home' : '/start';
+      }      
 
       if(!isLoggedIn) return '/start';
       if (isLoggedIn && state.uri.toString() == '/start') return '/home';
+
+      return null;
     },
     routes: [
       GoRoute(

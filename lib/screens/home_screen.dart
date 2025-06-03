@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/utils/appscreenconfig.dart';
@@ -29,9 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       appBarActions: [
         IconButton(
-          icon: Icon(Icons.notifications),
+          icon: Icon(Icons.exit_to_app),
           onPressed: () {
-            
+            FirebaseAuth.instance.signOut();
           },
         ),
         IconButton(
