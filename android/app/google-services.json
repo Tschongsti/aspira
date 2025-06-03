@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253430282938",
+    "project_id": "aspira-91ce3",
+    "storage_bucket": "aspira-91ce3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253430282938:android:9a7d1e893fa86aaa15e083",
+        "android_client_info": {
+          "package_name": "ch.lukas.aspira"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD90XGaAu1W1wKJF2oFRVBLDTI2bQkNczo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
