@@ -148,9 +148,14 @@ class _StartScreenState extends State<StartScreen> {
                                 .colorScheme
                                 .primaryContainer,
                             ),
-                            child: Text (_isLogin
-                              ? 'Login'
-                              : 'Signup'),
+                            child: Text (
+                              _isLogin
+                                ? 'Login'
+                                : 'Signup',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                           if (!_isAuthenticating)
                           TextButton(
