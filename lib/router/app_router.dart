@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/providers/visited_screens_provider.dart';
@@ -16,14 +18,26 @@ import 'package:aspira/screens/fokustracking_screen.dart';
 import 'package:aspira/screens/fokustracking_new_item.dart';
 import 'package:aspira/screens/gewohnheitstracking_screen.dart';
 import 'package:aspira/screens/schlaftracking_screen.dart';
+import 'package:aspira/screens/splash_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final routerNotifier = RouterNotifier(ref);
 
   return GoRouter(
-    initialLocation: '/start',
+    initialLocation: '/splash',
     refreshListenable: routerNotifier,
+    redirect: (context, state) {
+      final user = FirebaseAuth.instance.currentUser;
+      final isLoggedIn = user != null;
+
+      if(!isLoggedIn) return '/start';
+      if (isLoggedIn && state.uri.toString() == '/start') return '/home';
+    },
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: '/start',
         builder: (context, state) => const StartScreen(),
