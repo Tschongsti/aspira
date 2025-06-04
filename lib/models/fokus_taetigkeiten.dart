@@ -62,4 +62,17 @@ class FokusTaetigkeit {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'iconName': iconName.name,
+      'weeklyGoal': weeklyGoal.inMinutes,
+      'startDate': startDate.toIso8601String(),
+      'loggedTime': loggedTime.inMinutes,
+      'status': status.name,
+    };
+  }
+
 }

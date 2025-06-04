@@ -23,7 +23,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
   @override
   void initState() {
     super.initState();
-    _focusactivitiesFuture = ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities();
+    _focusactivitiesFuture = ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities(context);
   }
 
   @override
@@ -70,7 +70,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
                   action: SnackBarAction(
                     label: 'Wiederherstellen',
                     onPressed: () {
-                      notifier.insertAt(index, fokus);
+                      notifier.insertAt(index, fokus, context);
                     },
                   ),
                 ),
