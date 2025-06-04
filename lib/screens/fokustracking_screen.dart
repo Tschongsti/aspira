@@ -23,7 +23,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
   @override
   void initState() {
     super.initState();
-    _focusactivitiesFuture = ref.read(userFokusActivitiesProvider.notifier).loadFocusActivities();
+    _focusactivitiesFuture = ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities();
   }
 
   @override

@@ -1,34 +1,59 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:sqflite/sqlite_api.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/data/database.dart';
+import 'package:aspira/utils/get_current_user.dart';
 
 
 class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
   UserFokusActivitiesNotifier() : super(const []);
 
-  Future<void> loadFocusActivities() async {
-    final db = await getDatabase();
-    final data = await db.query('user_focusactivities');
-    final focusactivities = data.map(
-      (row) => FokusTaetigkeit(
-        id: row['id'] as String,
-        title: row['title'] as String,
-        description: row['description'] as String,
-        iconName: IconName.values.byName(row['iconName'] as String),
-        weeklyGoal: Duration(minutes: row['weeklyGoal'] as int),
-        startDate: DateTime.parse(row['startDate'] as String),
-        loggedTime: Duration(minutes: row['loggedTime'] as int),
-        status: Status.values.byName(row['status'] as String),
-      ),
-    ).toList();
+  Future<void> loadFokusActivities() async {
+    final user = getCurrentUserOrThrow();
 
-    state = focusactivities;
+    // Firestore lesen
+    final snapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('fokus_activities')
+      .get();
+
+    final fokusActivities = snapshot.docs.map((doc) {
+      final data = doc.data();
+      return FokusTaetigkeit(
+        id: data['id'] as String,
+        title: data['title'] as String,
+        description: data['description'] as String,
+        iconName: IconName.values.byName(data['iconName'] as String),
+        weeklyGoal: Duration(minutes: data['weeklyGoal'] as int),
+        startDate: DateTime.parse(data['startDate'] as String),
+        loggedTime: Duration(minutes: data['loggedTime'] as int),
+        status: Status.values.byName(data['status'] as String),
+      );
+    }).toList();
+    
+     // 2. Lokale DB aktualisieren
+    final db = await getDatabase();
+    await db.delete('user_focusactivities'); // clear cache
+
+    for (final fokus in fokusActivities) {
+      await db.insert('user_focusactivities', {
+        'id': fokus.id,
+        'title': fokus.title,
+        'description': fokus.description,
+        'iconName': fokus.iconName.name,
+        'weeklyGoal': fokus.weeklyGoal.inMinutes,
+        'startDate': fokus.startDate.toIso8601String(),
+        'loggedTime': fokus.loggedTime.inMinutes,
+        'status': fokus.status.name,
+      });
+    }
+
+    state = fokusActivities;
   }
 
   void addFokusTaetigkeit(FokusTaetigkeit fokus) async {   
@@ -47,10 +72,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     });
 
     // Speicherung in Firebase
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception ('Kein eingeloggter Benutzer gefunden.');
-    }
+    final user = getCurrentUserOrThrow();
 
     final fokusDoc = FirebaseFirestore.instance
       .collection('users')
