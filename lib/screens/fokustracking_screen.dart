@@ -60,7 +60,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
               final notifier = ref.read(userFokusActivitiesProvider.notifier);
               final index = fokusTaetigkeiten.indexOf(fokus);
 
-              notifier.deleteFokustaetigkeit(fokus);
+              notifier.deleteFokustaetigkeit(fokus, context);
 
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(

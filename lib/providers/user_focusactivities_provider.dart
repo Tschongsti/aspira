@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -56,42 +57,52 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     state = fokusActivities;
   }
 
-  void addFokusTaetigkeit(FokusTaetigkeit fokus) async {   
-    
-    // lokale Speicherung
-    final db = await getDatabase();
-    await db.insert('user_focusactivities', {
-      'id': fokus.id,
-      'title': fokus.title,
-      'description': fokus.description,
-      'iconName': fokus.iconName.name,
-      'weeklyGoal': fokus.weeklyGoal.inMinutes,
-      'startDate': fokus.startDate.toIso8601String(),
-      'loggedTime': fokus.loggedTime.inMinutes,
-      'status': fokus.status.name,
-    });
-
+  Future<void> addFokusTaetigkeit(FokusTaetigkeit fokus, BuildContext context) async {   
     // Speicherung in Firebase
-    final user = getCurrentUserOrThrow();
+    try {
+      final user = getCurrentUserOrThrow();
 
-    final fokusDoc = FirebaseFirestore.instance
-      .collection('users')
-      .doc(user.uid)
-      .collection('fokus_activities')
-      .doc(fokus.id);
+      final fokusDoc = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('fokus_activities')
+        .doc(fokus.id);
 
-    await fokusDoc.set({
-      'id': fokus.id,
-      'title': fokus.title,
-      'description': fokus.description,
-      'iconName': fokus.iconName.name,
-      'weeklyGoal': fokus.weeklyGoal.inMinutes,
-      'startDate': fokus.startDate.toIso8601String(),
-      'loggedTime': fokus.loggedTime.inMinutes,
-      'status': fokus.status.name,
-    });
-    
-    state = [fokus, ...state]; // new FokusTätigkeit is always at the start of the list
+      await fokusDoc.set({
+        'id': fokus.id,
+        'title': fokus.title,
+        'description': fokus.description,
+        'iconName': fokus.iconName.name,
+        'weeklyGoal': fokus.weeklyGoal.inMinutes,
+        'startDate': fokus.startDate.toIso8601String(),
+        'loggedTime': fokus.loggedTime.inMinutes,
+        'status': fokus.status.name,
+      });
+      
+      // lokale Speicherung
+      final db = await getDatabase();
+      await db.insert('user_focusactivities', {
+        'id': fokus.id,
+        'title': fokus.title,
+        'description': fokus.description,
+        'iconName': fokus.iconName.name,
+        'weeklyGoal': fokus.weeklyGoal.inMinutes,
+        'startDate': fokus.startDate.toIso8601String(),
+        'loggedTime': fokus.loggedTime.inMinutes,
+        'status': fokus.status.name,
+      });
+
+      state = [fokus, ...state]; // new FokusTätigkeit is always at the start of the list
+    } catch (error, stack) {
+      debugPrint('Fehler addFokusTaetigkeit: $error');
+      debugPrintStack(stackTrace: stack);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Hinzufügen fehlgeschlagen. Bitte versuche es noch einmal.')),
+        );
+      }
+    }
   }
 
   Future<void> deleteFokusTaetigkeitFromCloud(String id) async {
@@ -105,20 +116,38 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         .delete();
   }
 
-  void deleteFokustaetigkeit(FokusTaetigkeit fokus) async { 
+  void deleteFokustaetigkeit(FokusTaetigkeit fokus, BuildContext context) async { 
     // lokaler State
+    final previousState = [...state];
     state = [...state]..remove(fokus);
 
-    // Firebase
-    await deleteFokusTaetigkeitFromCloud(fokus.id);
+    try{
+      // Firebase
+      await deleteFokusTaetigkeitFromCloud(fokus.id);
 
-    // lokaleDB
-    final db = await getDatabase();
-    await db.delete(
-      'user_focusactivities',
-      where: 'id = ?',
-      whereArgs: [fokus.id],
-    );    
+      // lokaleDB
+      final db = await getDatabase();
+      await db.delete(
+        'user_focusactivities',
+        where: 'id = ?',
+        whereArgs: [fokus.id],
+      );
+    } catch (error, stack) {
+      debugPrint('Fehler deleteFokusTaetigkeit: $error');
+      debugPrintStack(stackTrace: stack);
+
+      // Zurückrollen im Fehlerfall
+      state = previousState;
+
+      // Feedback im UI
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Löschen fehlgeschlagen. Bitte versuch es nochmal einmal.'),
+          ),
+        );
+      }
+    }
   }
 
   Future<void> insertFokusTaetigkeitToCloud(FokusTaetigkeit fokus) async {

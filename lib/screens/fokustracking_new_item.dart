@@ -37,6 +37,7 @@ class _NewFokustaetigkeitScreenState extends ConsumerState<NewFokustaetigkeitScr
         iconName: _selectedIcon,
         weeklyGoal: Duration(minutes: _weeklyGoal),
         ),
+        context,
      );
 
     // if (!mounted) return;
