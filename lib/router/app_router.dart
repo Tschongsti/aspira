@@ -19,6 +19,7 @@ import 'package:aspira/screens/fokustracking_new_item.dart';
 import 'package:aspira/screens/gewohnheitstracking_screen.dart';
 import 'package:aspira/screens/schlaftracking_screen.dart';
 import 'package:aspira/screens/splash_screen.dart';
+import 'package:aspira/screens/profile_edit_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final routerNotifier = RouterNotifier(ref);
@@ -93,6 +94,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        builder: (context, state) => const ProfileEditScreen(),
       ),
       GoRoute(
         path: '/profile/notifications',
