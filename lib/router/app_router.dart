@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/providers/visited_screens_provider.dart';
 import 'package:aspira/router/router_notifier.dart';
 import 'package:aspira/screens/start_screen.dart';
@@ -97,7 +98,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/profile/edit',
-        builder: (context, state) => const ProfileEditScreen(),
+        builder: (context, state) {
+          final userProfile = state.extra as UserProfile;
+          return ProfileEditScreen(userProfile: userProfile);
+        },
       ),
       GoRoute(
         path: '/profile/notifications',

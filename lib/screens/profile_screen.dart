@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -9,9 +10,47 @@ import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  UserProfile? _userProfile;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final docRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('user_profile')
+        .doc('main');
+
+    try {
+      final snapshot = await docRef.get();
+      if (snapshot.exists) {
+        setState(() {
+          _userProfile = UserProfile.fromMap(user.uid, snapshot.data()!);
+        });
+      }
+    } catch (error) {
+      debugPrint('Fehler loadUserProfile: $error');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }   
+  
   Future<void> _resetVisitedScreens(BuildContext context) async {
     final db = await getDatabase();
     await db.delete('visited_screens');
@@ -30,15 +69,23 @@ class ProfileScreen extends StatelessWidget {
       appBarActions: [
         IconButton(
           icon: const Icon(Icons.edit),
-          onPressed: () {
-            context.push('/profile/edit');
+          onPressed: () async {
+            final updatedProfile = await context.push('/profile/edit');
+            if (updatedProfile is UserProfile) {
+              setState(() {
+                _userProfile = updatedProfile;
+              });
+            }
           },
         ),
       ],
     );
     
-    final user = FirebaseAuth.instance.currentUser!;
-    final profile = UserProfile(id: user.uid, email: user.email!);
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return AppScaffold(
       config: config,
@@ -55,10 +102,10 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 child: CircleAvatar(
                   radius: 48,
-                  backgroundImage: profile.photoUrl != null 
-                    ? NetworkImage(profile.photoUrl!)
+                  backgroundImage: _userProfile?.photoUrl != null 
+                    ? NetworkImage(_userProfile!.photoUrl!)
                     : null,
-                  child: profile.photoUrl == null 
+                  child: _userProfile?.photoUrl == null 
                     ? const Icon(Icons.person, size: 32) 
                     : null,
                 ),
@@ -66,7 +113,9 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  profile.displayName ?? 'Kein Name gesetzt',
+                  _userProfile?.displayName?.isNotEmpty == true
+                      ? _userProfile!.displayName!
+                      : 'Kein Name gesetzt',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),

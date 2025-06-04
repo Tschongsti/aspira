@@ -13,7 +13,12 @@ import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 
 class ProfileEditScreen extends StatefulWidget {
-  const ProfileEditScreen({super.key});
+  const ProfileEditScreen({
+    super.key,
+    required this.userProfile,
+    });
+
+  final UserProfile userProfile;
 
   @override
   State<ProfileEditScreen> createState() => _UserProfileEditScreenState();
@@ -21,48 +26,14 @@ class ProfileEditScreen extends StatefulWidget {
 
 class _UserProfileEditScreenState extends State<ProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
-  UserProfile? _userProfile;
+  late UserProfile? _userProfile;
   File? _profileImage;
   bool _isLoading =true;
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
-    final user = FirebaseAuth.instance.currentUser!;
-    final docRef = FirebaseFirestore.instance
-      .collection('users')
-      .doc(user.uid)
-      .collection('user_profile')
-      .doc('main');
-
-    try {
-      final snapshot = await docRef.get();
-
-      if (!snapshot.exists) {
-        // Dokument initial anlegen
-        final defaultProfile = UserProfile(
-          id: user.uid,
-          email: user.email ?? '',
-          displayName: '',
-          photoUrl: null,
-        );
-        await docRef.set(defaultProfile.toMap());
-        _userProfile = defaultProfile;
-      } else {
-        // Daten laden wie bisher
-        _userProfile = UserProfile.fromMap(user.uid, snapshot.data()!);
-      }
-    } catch (error) {
-      debugPrint("Fehler loadUserProfile:' $error");
-    } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    _userProfile = widget.userProfile;
   }
 
   Future<void> _pickImage() async {
