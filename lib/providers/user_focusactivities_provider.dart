@@ -94,20 +94,58 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     state = [fokus, ...state]; // new FokusTätigkeit is always at the start of the list
   }
 
-  void remove(FokusTaetigkeit fokus) async {
+  Future<void> deleteFokusTaetigkeitFromCloud(String id) async {
+    final user = getCurrentUserOrThrow();
     
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('fokus_activities')
+        .doc(id)
+        .delete();
+  }
+
+  void deleteFokustaetigkeit(FokusTaetigkeit fokus) async { 
+    // lokaler State
+    state = [...state]..remove(fokus);
+
+    // Firebase
+    await deleteFokusTaetigkeitFromCloud(fokus.id);
+
+    // lokaleDB
     final db = await getDatabase();
     await db.delete(
       'user_focusactivities',
       where: 'id = ?',
       whereArgs: [fokus.id],
-    );
-    
-    state = [...state]..remove(fokus);
+    );    
+  }
+
+  Future<void> insertFokusTaetigkeitToCloud(FokusTaetigkeit fokus) async {
+    final user = getCurrentUserOrThrow();
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('fokus_activities')
+        .doc(fokus.id)
+        .set({
+      'id': fokus.id,
+      'title': fokus.title,
+      'description': fokus.description,
+      'iconName': fokus.iconName.name,
+      'weeklyGoal': fokus.weeklyGoal.inMinutes,
+      'startDate': fokus.startDate.toIso8601String(),
+      'loggedTime': fokus.loggedTime.inMinutes,
+      'status': fokus.status.name,
+    });
   }
 
   void insertAt(int index, FokusTaetigkeit fokus) async {
-    
+    // Firebase
+    await insertFokusTaetigkeitToCloud(fokus);
+
+    // lokaleDB
     final db = await getDatabase();
     await db.insert(
       'user_focusactivities',
@@ -124,6 +162,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );    
     
+    // lokaler State
     final newList = [...state];
     newList.insert(index, fokus);
     state = newList;
