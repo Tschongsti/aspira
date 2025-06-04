@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:sqflite/sqlite_api.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
@@ -30,8 +33,32 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
   void addFokusTaetigkeit(FokusTaetigkeit fokus) async {   
     
+    // lokale Speicherung
     final db = await getDatabase();
     await db.insert('user_focusactivities', {
+      'id': fokus.id,
+      'title': fokus.title,
+      'description': fokus.description,
+      'iconName': fokus.iconName.name,
+      'weeklyGoal': fokus.weeklyGoal.inMinutes,
+      'startDate': fokus.startDate.toIso8601String(),
+      'loggedTime': fokus.loggedTime.inMinutes,
+      'status': fokus.status.name,
+    });
+
+    // Speicherung in Firebase
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception ('Kein eingeloggter Benutzer gefunden.');
+    }
+
+    final fokusDoc = FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('fokus_activities')
+      .doc(fokus.id);
+
+    await fokusDoc.set({
       'id': fokus.id,
       'title': fokus.title,
       'description': fokus.description,
