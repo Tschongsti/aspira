@@ -70,7 +70,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () async {
-            final updatedProfile = await context.push('/profile/edit');
+            final updatedProfile = await context.push<UserProfile>(
+              '/profile/edit',
+              extra: _userProfile,
+            );
             if (updatedProfile is UserProfile) {
               setState(() {
                 _userProfile = updatedProfile;

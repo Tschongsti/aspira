@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -19,6 +20,20 @@ class HomeScreen extends StatefulWidget{
 
 class _HomeScreenState extends State<HomeScreen> {
   
+  void setupPushNotifications () async {
+    final fcm = FirebaseMessaging.instance;
+
+    await fcm.requestPermission();
+    
+    fcm.subscribeToTopic('development_updates');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setupPushNotifications();
+  } 
+
   @override
   Widget build(BuildContext context) {
     final config = AppScreenConfig(
