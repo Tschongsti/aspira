@@ -52,7 +52,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
 
     final mainContent = fokusTaetigkeiten.isEmpty
         ? const Center(
-            child: Text('Keine Fokus-Tätigkeiten gefunden. Bitte füge eine hinzu!'),
+            child: Text('Keine Fokus-Tätigkeiten gefunden.'),
           )
         : FokustrackingList(
             fokusTaetigkeiten: fokusTaetigkeiten,

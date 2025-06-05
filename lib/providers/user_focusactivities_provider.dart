@@ -24,18 +24,20 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         .collection('fokus_activities')
         .get();
 
-      final fokusActivities = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return FokusTaetigkeit(
-          id: data['id'] as String,
-          title: data['title'] as String,
-          description: data['description'] as String,
-          iconName: IconName.values.byName(data['iconName'] as String),
-          weeklyGoal: Duration(minutes: data['weeklyGoal'] as int),
-          startDate: DateTime.parse(data['startDate'] as String),
-          loggedTime: Duration(minutes: data['loggedTime'] as int),
-          status: Status.values.byName(data['status'] as String),
-        );
+      final fokusActivities = snapshot.docs
+        .where((doc) => !doc.id.contains('_')) // filtert versionierte Einträge
+        .map((doc) {
+          final data = doc.data();
+          return FokusTaetigkeit(
+            id: data['id'] as String,
+            title: data['title'] as String,
+            description: data['description'] as String,
+            iconName: IconName.values.byName(data['iconName'] as String),
+            weeklyGoal: Duration(minutes: data['weeklyGoal'] as int),
+            startDate: DateTime.parse(data['startDate'] as String),
+            loggedTime: Duration(minutes: data['loggedTime'] as int),
+            status: Status.values.byName(data['status'] as String),
+          );
       }).toList();
       
       // 2. Lokale DB aktualisieren
@@ -89,6 +91,73 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
           const SnackBar(content: Text('Hinzufügen fehlgeschlagen. Bitte versuche es noch einmal.')),
         );
       }
+    }
+  }
+
+  Future<void> updateFokusTaetigkeit(FokusTaetigkeit updated, {bool versionGoal = false}) async {
+    final previousState = [...state];
+
+    try {
+      final user = getCurrentUserOrThrow();
+      
+      // Alte Version aus dem State holen (für Versionierung wichtig)
+      final old = state.firstWhere((item) => item.id == updated.id);
+      
+      // 1. Falls versioniert werden soll → alte Version archivieren
+      if (versionGoal) {
+        final timestamp = DateTime.now().toIso8601String();
+        final versioned = FokusTaetigkeit(
+          id: '${old.id}_$timestamp',
+          title: old.title,
+          description: old.description,
+          iconName: old.iconName,
+          weeklyGoal: old.weeklyGoal,
+          startDate: old.startDate,
+          loggedTime: old.loggedTime,
+          status: old.status,
+        );
+
+        final archiveDoc = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('fokus_activities')
+            .doc(versioned.id);
+
+        await archiveDoc.set(versioned.toMap());
+      }
+
+      // 2. Firestore überschreiben
+      final fokusDoc = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('fokus_activities')
+          .doc(updated.id);
+
+      await fokusDoc.set(updated.toMap());
+
+      // 3. SQLite überschreiben
+      final db = await getDatabase();
+      await db.update(
+        'user_focusactivities',
+        updated.toMap(),
+        where: 'id = ?',
+        whereArgs: [updated.id],
+      );
+
+      // 4. State aktualisieren
+      final index = state.indexWhere((item) => item.id == updated.id);
+      if (index != -1) {
+        final newList = [...state];
+        newList[index] = updated;
+        state = newList;
+      }
+
+    } catch (error, stackTrace) {
+      debugPrint('Fehler updateFokusTaetigkeit: $error');
+      debugPrintStack(stackTrace: stackTrace);
+
+      // Fallback
+      state = previousState;
     }
   }
 

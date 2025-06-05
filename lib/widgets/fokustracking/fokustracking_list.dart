@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:go_router/go_router.dart';
+
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/widgets/fokustracking/fokustracking_item.dart';
 
@@ -28,8 +30,16 @@ class FokustrackingList extends StatelessWidget{
         onDismissed: (direction) {
             onRemoveFokustaetigkeit(fokusTaetigkeiten[index]);
         },
-        child: FokustrackingItem(
-          fokusTaetigkeiten[index],
+        child: InkWell(
+          onTap:() {
+            context.push(
+              '/ins-tun/fokus/edit',
+              extra: fokusTaetigkeiten[index], 
+            );
+          },
+          child: FokustrackingItem(
+            fokusTaetigkeiten[index],
+          ),
         ),
       ),
     );

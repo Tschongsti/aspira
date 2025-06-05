@@ -75,4 +75,23 @@ class FokusTaetigkeit {
     };
   }
 
+  factory FokusTaetigkeit.fromMap(Map<String, dynamic> map) {
+    return FokusTaetigkeit(
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      iconName: IconName.values.firstWhere(
+        (error) => error.name == map['iconName'],
+        orElse: () => IconName.favorite, // fallback
+      ),
+      weeklyGoal: Duration(minutes: map['weeklyGoal']),
+      startDate: DateTime.parse(map['startDate']),
+      loggedTime: Duration(minutes: map['loggedTime']),
+      status: Status.values.firstWhere(
+        (error) => error.name == map['status'],
+        orElse: () => Status.active, // fallback
+      ),
+    );
+  }
+
 }

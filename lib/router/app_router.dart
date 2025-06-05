@@ -1,3 +1,4 @@
+import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,7 +17,7 @@ import 'package:aspira/screens/benachrichtigungen_screen.dart';
 import 'package:aspira/screens/instunkommen_screen.dart';
 import 'package:aspira/screens/fokustracking_intro_screen.dart';
 import 'package:aspira/screens/fokustracking_screen.dart';
-import 'package:aspira/screens/fokustracking_new_item.dart';
+import 'package:aspira/screens/fokustracking_details_screen.dart';
 import 'package:aspira/screens/gewohnheitstracking_screen.dart';
 import 'package:aspira/screens/schlaftracking_screen.dart';
 import 'package:aspira/screens/splash_screen.dart';
@@ -82,7 +83,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/ins-tun/fokus/new',
-        builder: (context, state) => const NewFokustaetigkeitScreen(),
+        builder: (context, state) => const FokustrackingDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/ins-tun/fokus/edit',
+        builder: (context, state) {
+          final fokus = state.extra as FokusTaetigkeit;
+          return FokustrackingDetailsScreen(initialData: fokus);
+        },
       ),
       GoRoute(
         path: '/ins-tun/gewohnheit',
