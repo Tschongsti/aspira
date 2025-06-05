@@ -248,3 +248,5 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 final userFokusActivitiesProvider = StateNotifierProvider<UserFokusActivitiesNotifier, List <FokusTaetigkeit>>(
   (ref) => UserFokusActivitiesNotifier(),
 );
+
+final showInactiveProvider = StateProvider<bool>((ref) => false);

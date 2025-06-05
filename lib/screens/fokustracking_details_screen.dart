@@ -61,7 +61,12 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
 
     try {
       await notifier.updateFokusTaetigkeit(toggled, versionGoal: false);
-      if (mounted) Navigator.of(context).pop();
+
+      if (mounted) {
+        ref.read(showInactiveProvider.notifier).state = false;
+        Navigator.of(context).pop();
+      }
+      
     } catch (error, stackTrace) {
       debugPrint('Fehler toggleStatus: $error');
       debugPrintStack(stackTrace: stackTrace);

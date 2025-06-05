@@ -20,8 +20,7 @@ class FokustrackingScreen extends ConsumerStatefulWidget {
 
 class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> { 
   late Future<void> _focusactivitiesFuture;
-  bool _showInactive = false;
-
+  
   @override
   void initState() {
     super.initState();
@@ -32,9 +31,10 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
   Widget build(BuildContext context) {
     final fokusTaetigkeiten = ref.watch(userFokusActivitiesProvider);
     final hasInactive = fokusTaetigkeiten.any((item) => item.status == Status.inactive);
+    final showInactive = ref.watch(showInactiveProvider);
 
     final filteredList = fokusTaetigkeiten.where((fokus) =>
-      _showInactive
+      showInactive
         ? fokus.status == Status.inactive
         : fokus.status == Status.active
     ).toList();
@@ -105,12 +105,10 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
                         children: [
                           TextButton.icon(
                             onPressed: () {
-                              setState(() {
-                                _showInactive = !_showInactive;
-                              });
-                            },
-                            icon: Icon(_showInactive ? Icons.visibility : Icons.visibility_off),
-                            label: Text(_showInactive
+                              ref.read(showInactiveProvider.notifier).state = !showInactive;
+                            },                          
+                            icon: Icon(showInactive ? Icons.visibility : Icons.visibility_off),
+                            label: Text(showInactive
                                 ? 'Aktive Fokustätigkeiten anzeigen'
                                 : 'Inaktive Fokustätigkeiten anzeigen'),
                           ),
