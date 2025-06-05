@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
@@ -19,6 +20,7 @@ class FokustrackingScreen extends ConsumerStatefulWidget {
 
 class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> { 
   late Future<void> _focusactivitiesFuture;
+  bool _showInactive = false;
 
   @override
   void initState() {
@@ -29,6 +31,12 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final fokusTaetigkeiten = ref.watch(userFokusActivitiesProvider);
+
+    final filteredList = fokusTaetigkeiten.where((fokus) =>
+      _showInactive
+        ? fokus.status == Status.inactive
+        : fokus.status == Status.active
+    ).toList();
 
     final config = AppScreenConfig(
       title: 'Fokus Tätigkeiten',
@@ -51,11 +59,13 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
     );
 
     final mainContent = fokusTaetigkeiten.isEmpty
-        ? const Center(
-            child: Text('Keine Fokus-Tätigkeiten gefunden.'),
+        ? Center(
+            child: Text(_showInactive
+              ? 'Keine inaktiven Fokus-Tätigkeiten gefunden.'
+              : 'Keine Fokus-Tätigkeiten gefunden. Bitte füge eine hinzu!'),
           )
         : FokustrackingList(
-            fokusTaetigkeiten: fokusTaetigkeiten,
+            fokusTaetigkeiten: filteredList,
             onRemoveFokustaetigkeit: (fokus) {
               final notifier = ref.read(userFokusActivitiesProvider.notifier);
               final index = fokusTaetigkeiten.indexOf(fokus);
@@ -88,6 +98,25 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
             : Column(
                 children: [
                   Expanded(child: mainContent),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _showInactive = !_showInactive;
+                            });
+                          },
+                          icon: Icon(_showInactive ? Icons.visibility : Icons.visibility_off),
+                          label: Text(_showInactive
+                              ? 'Aktive Fokustätigkeiten anzeigen'
+                              : 'Inaktive Fokustätigkeiten anzeigen'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
       ),
