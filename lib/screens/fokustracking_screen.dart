@@ -31,6 +31,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final fokusTaetigkeiten = ref.watch(userFokusActivitiesProvider);
+    final hasInactive = fokusTaetigkeiten.any((item) => item.status == Status.inactive);
 
     final filteredList = fokusTaetigkeiten.where((fokus) =>
       _showInactive
@@ -60,9 +61,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
 
     final mainContent = fokusTaetigkeiten.isEmpty
         ? Center(
-            child: Text(_showInactive
-              ? 'Keine inaktiven Fokus-Tätigkeiten gefunden.'
-              : 'Keine Fokus-Tätigkeiten gefunden. Bitte füge eine hinzu!'),
+            child: Text('Keine Fokus-Tätigkeiten gefunden. Bitte füge eine hinzu!'),
           )
         : FokustrackingList(
             fokusTaetigkeiten: filteredList,
@@ -98,25 +97,26 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
             : Column(
                 children: [
                   Expanded(child: mainContent),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              _showInactive = !_showInactive;
-                            });
-                          },
-                          icon: Icon(_showInactive ? Icons.visibility : Icons.visibility_off),
-                          label: Text(_showInactive
-                              ? 'Aktive Fokustätigkeiten anzeigen'
-                              : 'Inaktive Fokustätigkeiten anzeigen'),
-                        ),
-                      ],
+                  if (hasInactive)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _showInactive = !_showInactive;
+                              });
+                            },
+                            icon: Icon(_showInactive ? Icons.visibility : Icons.visibility_off),
+                            label: Text(_showInactive
+                                ? 'Aktive Fokustätigkeiten anzeigen'
+                                : 'Inaktive Fokustätigkeiten anzeigen'),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
       ),
