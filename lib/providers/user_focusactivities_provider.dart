@@ -161,33 +161,66 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     }
   }
 
-  Future<void> deleteFokusTaetigkeitFromCloud(String id) async {
-    final user = getCurrentUserOrThrow();
-    
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('fokus_activities')
-        .doc(id)
-        .delete();
-  }
-
   void deleteFokustaetigkeit(FokusTaetigkeit fokus, BuildContext context) async { 
     // lokaler State
     final previousState = [...state];
-    state = [...state]..remove(fokus);
-
+    
     try{
-      // Firebase
-      await deleteFokusTaetigkeitFromCloud(fokus.id);
-
-      // lokaleDB
+      final user = getCurrentUserOrThrow();
       final db = await getDatabase();
-      await db.delete(
-        'user_focusactivities',
-        where: 'id = ?',
-        whereArgs: [fokus.id],
-      );
+
+      if (fokus.loggedTime == Duration.zero) {
+        // 1. Hard delete in Firebase
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('fokus_activities')
+            .doc(fokus.id)
+            .delete();
+
+        // 2. Hard delete in SQLite
+        await db.delete(
+          'user_focusactivities',
+          where: 'id = ?',
+          whereArgs: [fokus.id],
+        );
+
+        // 3. Aus dem lokalen State entfernen
+        state = [...state]..remove(fokus);
+      } else {
+        // Soft delete
+        final updated = FokusTaetigkeit(
+          id: fokus.id,
+          title: fokus.title,
+          description: fokus.description,
+          iconName: fokus.iconName,
+          weeklyGoal: fokus.weeklyGoal,
+          startDate: fokus.startDate,
+          loggedTime: fokus.loggedTime,
+          status: Status.deleted,
+        );
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('fokus_activities')
+            .doc(fokus.id)
+            .set(updated.toMap());
+
+        await db.update(
+          'user_focusactivities',
+          updated.toMap(),
+          where: 'id = ?',
+          whereArgs: [fokus.id],
+        );
+
+        final index = state.indexWhere((item) => item.id == fokus.id);
+        if (index != -1) {
+          final newList = [...state];
+          newList[index] = updated;
+          state = newList;
+        }
+      }
     } catch (error, stack) {
       debugPrint('Fehler deleteFokusTaetigkeit: $error');
       debugPrintStack(stackTrace: stack);
