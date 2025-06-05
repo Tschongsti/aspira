@@ -40,14 +40,13 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
     _selectedIcon = widget.initialData?.iconName ?? IconName.favorite;
   }
 
-  Future<void> _inaktivieren() async {
+  Future<void> _toggleStatus() async {
     if (widget.initialData == null) return;
 
     setState(() => _isSubmitting = true);
-    
     final notifier = ref.read(userFokusActivitiesProvider.notifier);
 
-    final deaktivierte = FokusTaetigkeit(
+    final toggled = FokusTaetigkeit(
       id: widget.initialData!.id,
       title: widget.initialData!.title,
       description: widget.initialData!.description,
@@ -55,22 +54,20 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       weeklyGoal: widget.initialData!.weeklyGoal,
       startDate: widget.initialData!.startDate,
       loggedTime: widget.initialData!.loggedTime,
-      status: Status.inactive,
+      status: widget.initialData!.status == Status.active
+          ? Status.inactive
+          : Status.active,
     );
 
     try {
-      await notifier.updateFokusTaetigkeit(deaktivierte, versionGoal: false);
-
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
+      await notifier.updateFokusTaetigkeit(toggled, versionGoal: false);
+      if (mounted) Navigator.of(context).pop();
     } catch (error, stackTrace) {
-      debugPrint('Fehler inaktivieren: $error');
+      debugPrint('Fehler toggleStatus: $error');
       debugPrintStack(stackTrace: stackTrace);
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Inaktivieren fehlgeschlagen.')),
+          const SnackBar(content: Text('Statusänderung fehlgeschlagen.')),
         );
       }
     } finally {
@@ -135,6 +132,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
   @override
   Widget build(BuildContext context) {
     final isEditMode = widget.initialData != null;
+    final isInactive = widget.initialData?.status == Status.inactive;
     
     return Scaffold(
       appBar: AppBar(
@@ -246,14 +244,18 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
                   ElevatedButton(
                     onPressed: _isSubmitting
                       ? null
-                      : _inaktivieren,
+                      : _toggleStatus,
                     child: _isSubmitting
                       ? const SizedBox(
                           height: 16,
                           width: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Fokustätigkeit inaktivieren'),
+                      : Text(
+                          isInactive
+                            ? 'Fokustätigkeit reaktivieren'
+                            : 'Fokustätigkeit inaktivieren',
+                        ),
                     ),
               ],
             ),
