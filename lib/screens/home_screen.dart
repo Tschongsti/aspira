@@ -10,9 +10,12 @@ import 'package:go_router/go_router.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/task_timer.dart';
+import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/timer_ticker_provider.dart';
 import 'package:aspira/providers/task_timer_provider.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
+import 'package:aspira/providers/daily_execution_provider.dart';
+import 'package:aspira/providers/weekly_sum_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/widgets/Homescreen/homescreen_task.dart';
@@ -162,6 +165,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     final timer = ref.watch(taskTimerProvider)[task.id];
                     final isRunning = timer?.isRunning ?? false;
                     final elapsed = timer?.elapsed ?? Duration.zero;
+                    final loggedTime = _computeLoggedTime(ref, task, selectedDate, elapsed);
 
                     if (isRunning) {
                       ref.watch(tickerProvider); // sekündlicher Widget rebuild (nur aktiv, wenn nötig)
@@ -171,7 +175,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       type: TaskType.timer,
                       icon: Icon(Icons.access_time), // du kannst später task.iconName zu einem echten Icon mappen
                       title: task.title,
-                      loggedTime: elapsed,
+                      loggedTime: loggedTime,
                       goalTime: task.weeklyGoal,
                       isRunning: isRunning, // Platzhalter – wird später dynamisch sein
                       onTapMainAction: () {
@@ -195,6 +199,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
+  }
+
+  Duration _computeLoggedTime(
+    WidgetRef ref,
+    TrackableTask task,
+    DateTime selectedDate,
+    Duration elapsed,
+  ) {
+    if (task is FokusTaetigkeit) {
+      final asyncWeekly = ref.watch(weeklySumProvider(task));
+      final weeklySum = asyncWeekly.value ?? Duration.zero;
+      return weeklySum + elapsed;
+    } else {
+      final startOfDay = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+      final asyncDaily = ref.watch(
+        dailyExecutionProvider((task: task, date: startOfDay)),
+      );
+      final dailySum = asyncDaily.value
+          ?.map((entry) => entry.duration)
+          .fold(Duration.zero, (a, b) => a + b) ?? Duration.zero;
+
+      return dailySum + elapsed;
+    }
   }
 
   Widget _placeholderCard(String text) {
