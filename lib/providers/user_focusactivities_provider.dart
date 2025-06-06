@@ -13,39 +13,31 @@ import 'package:aspira/utils/get_current_user.dart';
 class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
   UserFokusActivitiesNotifier() : super(const []);
 
+  CollectionReference<Map<String, dynamic>> _getFokusRef() {
+    final user = getCurrentUserOrThrow();
+    return FirebaseFirestore.instance
+      .collection('users')
+      .doc(user.uid)
+      .collection('fokus_activities');
+  }
+
   Future<void> loadFokusActivities(BuildContext context) async {
     try {
-      final user = getCurrentUserOrThrow();
-
+      
       // Firestore lesen
-      final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('fokus_activities')
-        .get();
+      final snapshot = await _getFokusRef().get();
 
       final fokusActivities = snapshot.docs
-        .where((doc) => !doc.id.contains('_')) // filtert versionierte Einträge
-        .map((doc) {
-          final data = doc.data();
-          return FokusTaetigkeit(
-            id: data['id'] as String,
-            title: data['title'] as String,
-            description: data['description'] as String,
-            iconName: IconName.values.byName(data['iconName'] as String),
-            weeklyGoal: Duration(minutes: data['weeklyGoal'] as int),
-            startDate: DateTime.parse(data['startDate'] as String),
-            loggedTime: Duration(minutes: data['loggedTime'] as int),
-            status: Status.values.byName(data['status'] as String),
-          );
-      }).toList();
-      
+        .where((doc) => !doc.id.contains('_'))
+        .map((doc) => FokusTaetigkeit.fromMap(doc.data()))
+        .toList();
+            
       // 2. Lokale DB aktualisieren
       final db = await getDatabase();
       await db.delete('user_focusactivities'); // clear cache
 
       for (final fokus in fokusActivities) {
-        await db.insert('user_focusactivities', fokus.toMap());
+        await db.insert('user_focusactivities', fokus.toLocalMap());
       }
       state = fokusActivities;
     } catch (error, stackTrace) {
@@ -66,20 +58,14 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     
     // Speicherung in Firebase
     try {
-      final user = getCurrentUserOrThrow();
+      final fokusDoc = _getFokusRef().doc(fokus.id);
 
-      final fokusDoc = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('fokus_activities')
-        .doc(fokus.id);
-
-      await fokusDoc.set(fokus.toMap());
-      debugPrint('addFokusTaetigkeit Firestore gespeichert: ${fokus.toMap()}');
+      await fokusDoc.set(fokus.toFirebaseMap());
+      debugPrint('addFokusTaetigkeit Firestore gespeichert: ${fokus.toFirebaseMap()}');
 
       // lokale Speicherung
       final db = await getDatabase();
-      await db.insert('user_focusactivities', fokus.toMap());
+      await db.insert('user_focusactivities', fokus.toLocalMap());
       debugPrint('addFokusTaetigkeit Lokal gespeichert: ${fokus.id}');
 
     } catch (error, stack) {
@@ -100,14 +86,12 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     final previousState = [...state];
 
     try {
-      final user = getCurrentUserOrThrow();
-      
       // Alte Version aus dem State holen (für Versionierung wichtig)
       final old = state.firstWhere((item) => item.id == updated.id);
       
       // 1. Falls versioniert werden soll → alte Version archivieren
       if (versionGoal) {
-        final timestamp = DateTime.now().toIso8601String();
+        final timestamp = DateTime.now().toLocal().toIso8601String();
         final versioned = FokusTaetigkeit(
           id: '${old.id}_$timestamp',
           title: old.title,
@@ -119,29 +103,21 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
           status: old.status,
         );
 
-        final archiveDoc = FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('fokus_activities')
-            .doc(versioned.id);
+        final archiveDoc = _getFokusRef().doc(versioned.id);
 
-        await archiveDoc.set(versioned.toMap());
+        await archiveDoc.set(versioned.toFirebaseMap());
       }
 
       // 2. Firestore überschreiben
-      final fokusDoc = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('fokus_activities')
-          .doc(updated.id);
+      final fokusDoc = _getFokusRef().doc(updated.id);
 
-      await fokusDoc.set(updated.toMap());
+      await fokusDoc.set(updated.toFirebaseMap());
 
       // 3. SQLite überschreiben
       final db = await getDatabase();
       await db.update(
         'user_focusactivities',
-        updated.toMap(),
+        updated.toLocalMap(),
         where: 'id = ?',
         whereArgs: [updated.id],
       );
@@ -168,17 +144,11 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     final previousState = [...state];
     
     try{
-      final user = getCurrentUserOrThrow();
       final db = await getDatabase();
 
       if (fokus.loggedTime == Duration.zero) {
         // 1. Hard delete in Firebase
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('fokus_activities')
-            .doc(fokus.id)
-            .delete();
+        await _getFokusRef().doc(fokus.id).delete();
 
         // 2. Hard delete in SQLite
         await db.delete(
@@ -202,16 +172,11 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
           status: Status.deleted,
         );
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('fokus_activities')
-            .doc(fokus.id)
-            .set(updated.toMap());
+        await _getFokusRef().doc(fokus.id).set(updated.toFirebaseMap());
 
         await db.update(
           'user_focusactivities',
-          updated.toMap(),
+          updated.toLocalMap(),
           where: 'id = ?',
           whereArgs: [fokus.id],
         );
@@ -242,14 +207,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
   }
 
   Future<void> insertFokusTaetigkeitToCloud(FokusTaetigkeit fokus) async {
-    final user = getCurrentUserOrThrow();
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('fokus_activities')
-        .doc(fokus.id)
-        .set(fokus.toMap());
+    await _getFokusRef().doc(fokus.id).set(fokus.toFirebaseMap());
   }
 
   void insertAt(int index, FokusTaetigkeit fokus, BuildContext context) async {
@@ -259,7 +217,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
       // lokaleDB
       final db = await getDatabase();
-      await db.insert('user_focusactivities', fokus.toMap(),
+      await db.insert('user_focusactivities', fokus.toLocalMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );    
       

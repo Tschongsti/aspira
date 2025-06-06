@@ -56,6 +56,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final weekDates = getCurrentWeekDates();
     final monthYear = DateFormat('MMMM yyyy', 'de_CH').format(selectedDate);
+    bool isSameDay(DateTime a, DateTime b) {
+      return a.year == b.year && a.month == b.month && a.day == b.day;
+    }
     
     final config = AppScreenConfig(
       title: monthYear,
@@ -83,7 +86,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   
     final allFokus = ref.watch(userFokusActivitiesProvider);
     final fokusForToday = allFokus.where((fokus) =>
-      fokus.status == Status.active && fokus.startDate.isBefore(selectedDate.add(const Duration(days: 1)))).toList();
+      fokus.status == Status.active &&
+      isSameDay(fokus.startDate, selectedDate)
+    ).toList();
 
     return AppScaffold(
       config: config,

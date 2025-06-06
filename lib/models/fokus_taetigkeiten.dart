@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:duration/duration.dart';
@@ -62,18 +64,23 @@ class FokusTaetigkeit {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({bool forFirebase = false}) {
     return {
       'id': id,
       'title': title,
       'description': description,
       'iconName': iconName.name,
       'weeklyGoal': weeklyGoal.inMinutes,
-      'startDate': startDate.toIso8601String(),
+      'startDate': forFirebase
+        ? Timestamp.fromDate(startDate)
+        : startDate.toLocal().toIso8601String(),
       'loggedTime': loggedTime.inMinutes,
       'status': status.name,
     };
   }
+
+  Map<String, dynamic> toFirebaseMap() => toMap(forFirebase: true);
+  Map<String, dynamic> toLocalMap() => toMap();
 
   factory FokusTaetigkeit.fromMap(Map<String, dynamic> map) {
     return FokusTaetigkeit(
@@ -85,7 +92,9 @@ class FokusTaetigkeit {
         orElse: () => IconName.favorite, // fallback
       ),
       weeklyGoal: Duration(minutes: map['weeklyGoal']),
-      startDate: DateTime.parse(map['startDate']),
+      startDate:map['startDate'] is Timestamp
+        ? (map['startDate'] as Timestamp).toDate()
+        : DateTime.parse(map['startDate']),
       loggedTime: Duration(minutes: map['loggedTime']),
       status: Status.values.firstWhere(
         (error) => error.name == map['status'],
