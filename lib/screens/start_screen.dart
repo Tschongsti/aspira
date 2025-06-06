@@ -1,3 +1,4 @@
+import 'package:aspira/utils/styling_theme.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -74,7 +75,7 @@ class _StartScreenState extends State<StartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: kAspiraBackground,
       body: Center(
         child: SingleChildScrollView(
           child: Column(

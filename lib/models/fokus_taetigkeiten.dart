@@ -1,3 +1,4 @@
+import 'package:aspira/models/trackable_task.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +21,7 @@ const categoryIcons = {
   IconName.favorite: Icons.favorite,
 };
 
-class FokusTaetigkeit {
+class FokusTaetigkeit implements TrackableTask {
   FokusTaetigkeit({
     required this.title,
     required this.description,
@@ -36,7 +37,9 @@ class FokusTaetigkeit {
     loggedTime = loggedTime ?? Duration.zero,
     status = status ?? Status.active;
 
+  @override
   final String id;
+  @override
   final String title;
   final String description;
   final IconName iconName;
@@ -44,6 +47,9 @@ class FokusTaetigkeit {
   final DateTime startDate;
   final Duration loggedTime;
   final Status status;
+
+  @override
+  String get parentCollection => 'fokus_activities';
 
   String get formattedDate {
     return formatter.format(startDate);

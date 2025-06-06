@@ -177,11 +177,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       onTapMainAction: () {
                         final timerNotifier = ref.read(taskTimerProvider.notifier);
                           if (isRunning) {
-                            timerNotifier.pause(task.id);
+                            timerNotifier.pauseTimer(task.id, task, context);
                           } else if (timer?.status == TaskTimerStatus.paused) {
-                            timerNotifier.resume(task.id);
+                            timerNotifier.resumeTimer(task.id);
                           } else {
-                            timerNotifier.start(task.id);
+                            timerNotifier.startTimer(task.id);
                           }
                         },
                       onEdit: () {
@@ -208,18 +208,4 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Text(text, style: const TextStyle(color: Colors.black54)),
     );
   }
-
-  Widget _focusTaskCard(FokusTaetigkeit task) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.deepPurple[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(task.title),
-    );
-  }
-
 }
