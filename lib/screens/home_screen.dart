@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:intl/intl.dart';
 
@@ -7,20 +8,22 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/providers/user_focusactivities_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 
-class HomeScreen extends StatefulWidget{
+class HomeScreen extends ConsumerStatefulWidget{
   const HomeScreen ({super.key});
 
   @override
-  State<HomeScreen> createState() {
+  ConsumerState<HomeScreen> createState() {
     return _HomeScreenState();
   }
 
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   DateTime selectedDate = DateTime.now();
   
   void setupPushNotifications () async {
@@ -34,6 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final contextCopy = context; // für mounted check
+      ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities(contextCopy);
+    });
+    
     setupPushNotifications();
   } 
 
@@ -72,6 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ]
     );
   
+    final allFokus = ref.watch(userFokusActivitiesProvider);
+    final fokusForToday = allFokus.where((fokus) =>
+      fokus.status == Status.active && fokus.startDate.isBefore(selectedDate.add(const Duration(days: 1)))).toList();
+
     return AppScaffold(
       config: config,
       child: Padding(
@@ -133,7 +146,11 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 24),
             const Text("Tracking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 12),
-            _placeholderCard("Keine Fokustätigkeit gestartet"),
+            fokusForToday.isEmpty
+              ? _placeholderCard("Keine Fokustätigkeit gestartet")
+              : Column(
+                  children: fokusForToday.map((task) => _focusTaskCard(task)).toList(),
+                ),
           ],
         ),
       ),
@@ -151,4 +168,18 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Text(text, style: const TextStyle(color: Colors.black54)),
     );
   }
+
+  Widget _focusTaskCard(FokusTaetigkeit task) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(task.title),
+    );
+  }
+
 }

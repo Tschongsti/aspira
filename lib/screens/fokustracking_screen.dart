@@ -19,14 +19,7 @@ class FokustrackingScreen extends ConsumerStatefulWidget {
 }
 
 class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> { 
-  late Future<void> _focusactivitiesFuture;
   
-  @override
-  void initState() {
-    super.initState();
-    _focusactivitiesFuture = ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     final fokusTaetigkeiten = ref.watch(userFokusActivitiesProvider);
@@ -89,34 +82,28 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
 
     return AppScaffold(
       config: config,
-      child: FutureBuilder(
-        future: _focusactivitiesFuture,
-        builder: (context, snapshot) =>
-          snapshot.connectionState == ConnectionState.waiting
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
+      child: Column(
+        children: [
+          Expanded(child: mainContent),
+          if (hasInactive)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(child: mainContent),
-                  if (hasInactive)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton.icon(
-                            onPressed: () {
-                              ref.read(showInactiveProvider.notifier).state = !showInactive;
-                            },                          
-                            icon: Icon(showInactive ? Icons.visibility : Icons.visibility_off),
-                            label: Text(showInactive
-                                ? 'Aktive Fokustätigkeiten anzeigen'
-                                : 'Inaktive Fokustätigkeiten anzeigen'),
-                          ),
-                        ],
-                      ),
-                    ),
+                  TextButton.icon(
+                    onPressed: () {
+                      ref.read(showInactiveProvider.notifier).state = !showInactive;
+                    },                          
+                    icon: Icon(showInactive ? Icons.visibility : Icons.visibility_off),
+                    label: Text(showInactive
+                        ? 'Aktive Fokustätigkeiten anzeigen'
+                        : 'Inaktive Fokustätigkeiten anzeigen'),
+                  ),
                 ],
               ),
+            ),
+        ],
       ),
     );
   }

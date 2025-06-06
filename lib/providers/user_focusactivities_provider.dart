@@ -75,10 +75,12 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         .doc(fokus.id);
 
       await fokusDoc.set(fokus.toMap());
-      
+      debugPrint('addFokusTaetigkeit Firestore gespeichert: ${fokus.toMap()}');
+
       // lokale Speicherung
       final db = await getDatabase();
       await db.insert('user_focusactivities', fokus.toMap());
+      debugPrint('addFokusTaetigkeit Lokal gespeichert: ${fokus.id}');
 
     } catch (error, stack) {
       debugPrint('Fehler addFokusTaetigkeit: $error');
@@ -283,3 +285,5 @@ final userFokusActivitiesProvider = StateNotifierProvider<UserFokusActivitiesNot
 );
 
 final showInactiveProvider = StateProvider<bool>((ref) => false);
+
+
