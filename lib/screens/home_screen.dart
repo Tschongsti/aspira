@@ -9,6 +9,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/models/task_timer.dart';
+import 'package:aspira/providers/timer_ticker_provider.dart';
+import 'package:aspira/providers/task_timer_provider.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
@@ -55,6 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(tickerProvider); // force redraw every second
     final weekDates = getCurrentWeekDates();
     final monthYear = DateFormat('MMMM yyyy', 'de_CH').format(selectedDate);
     bool isSameDay(DateTime a, DateTime b) {
@@ -156,18 +160,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ? _placeholderCard("Keine Fokustätigkeit gestartet")
               : Column(
                   children: fokusForToday.map((task) {
+                    final timer = ref.watch(taskTimerProvider)[task.id];
+                    final isRunning = timer?.isRunning ?? false;
+                    final elapsed = timer?.elapsed ?? Duration.zero;
+                    
                     return HomescreenTask(
                       type: TaskType.timer,
                       icon: Icon(Icons.access_time), // du kannst später task.iconName zu einem echten Icon mappen
                       title: task.title,
-                      loggedTime: task.loggedTime,
+                      loggedTime: elapsed,
                       goalTime: task.weeklyGoal,
-                      isRunning: false, // Platzhalter – wird später dynamisch sein
+                      isRunning: isRunning, // Platzhalter – wird später dynamisch sein
                       onTapMainAction: () {
-                        // hier kannst du später Timer starten/pausieren
-                        debugPrint('Start/Pause gedrückt für ${task.title}');
-                      },
+                        final timerNotifier = ref.read(taskTimerProvider.notifier);
+                          if (isRunning) {
+                            timerNotifier.pause(task.id);
+                          } else if (timer?.status == TaskTimerStatus.paused) {
+                            timerNotifier.resume(task.id);
+                          } else {
+                            timerNotifier.start(task.id);
+                          }
+                        },
                       onEdit: () {
+                        // später für manuelle Bearbeitung
                         debugPrint('Edit gedrückt für ${task.title}');
                       },
                     );
