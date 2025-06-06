@@ -58,7 +58,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(tickerProvider); // force redraw every second
     final weekDates = getCurrentWeekDates();
     final monthYear = DateFormat('MMMM yyyy', 'de_CH').format(selectedDate);
     bool isSameDay(DateTime a, DateTime b) {
@@ -163,6 +162,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     final timer = ref.watch(taskTimerProvider)[task.id];
                     final isRunning = timer?.isRunning ?? false;
                     final elapsed = timer?.elapsed ?? Duration.zero;
+
+                    if (isRunning) {
+                      ref.watch(tickerProvider); // sekündlicher Widget rebuild (nur aktiv, wenn nötig)
+                    }
                     
                     return HomescreenTask(
                       type: TaskType.timer,

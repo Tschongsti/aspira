@@ -64,23 +64,31 @@ class FokusTaetigkeit {
     );
   }
 
-  Map<String, dynamic> toMap({bool forFirebase = false}) {
+  Map<String, dynamic> toFirebaseMap() {
     return {
       'id': id,
       'title': title,
       'description': description,
       'iconName': iconName.name,
       'weeklyGoal': weeklyGoal.inMinutes,
-      'startDate': forFirebase
-        ? Timestamp.fromDate(startDate)
-        : startDate.toLocal().toIso8601String(),
+      'startDate': Timestamp.fromDate(startDate),
       'loggedTime': loggedTime.inMinutes,
       'status': status.name,
     };
   }
 
-  Map<String, dynamic> toFirebaseMap() => toMap(forFirebase: true);
-  Map<String, dynamic> toLocalMap() => toMap();
+  Map<String, dynamic> toLocalMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'iconName': iconName.name,
+      'weeklyGoal': weeklyGoal.inMinutes,
+      'startDate': startDate.toLocal().toIso8601String(),
+      'loggedTime': loggedTime.inMinutes,
+      'status': status.name,
+    };
+  }
 
   factory FokusTaetigkeit.fromMap(Map<String, dynamic> map) {
     return FokusTaetigkeit(
