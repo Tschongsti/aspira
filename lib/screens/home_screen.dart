@@ -12,6 +12,7 @@ import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/widgets/Homescreen/homescreen_task.dart';
 
 class HomeScreen extends ConsumerStatefulWidget{
   const HomeScreen ({super.key});
@@ -154,7 +155,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             fokusForToday.isEmpty
               ? _placeholderCard("Keine Fokustätigkeit gestartet")
               : Column(
-                  children: fokusForToday.map((task) => _focusTaskCard(task)).toList(),
+                  children: fokusForToday.map((task) {
+                    return HomescreenTask(
+                      type: TaskType.timer,
+                      icon: Icon(Icons.access_time), // du kannst später task.iconName zu einem echten Icon mappen
+                      title: task.title,
+                      loggedTime: task.loggedTime,
+                      goalTime: task.weeklyGoal,
+                      isRunning: false, // Platzhalter – wird später dynamisch sein
+                      onTapMainAction: () {
+                        // hier kannst du später Timer starten/pausieren
+                        debugPrint('Start/Pause gedrückt für ${task.title}');
+                      },
+                      onEdit: () {
+                        debugPrint('Edit gedrückt für ${task.title}');
+                      },
+                    );
+                  }).toList(),
                 ),
           ],
         ),
