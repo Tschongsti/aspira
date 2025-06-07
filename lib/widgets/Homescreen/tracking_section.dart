@@ -63,13 +63,24 @@ class TrackingSection extends ConsumerWidget {
           onTapMainAction: onTap,
           onEdit: !selectedDate.isAfter(DateTime.now())
             ? () {
-                context.push(
-                  '/edit',
-                  extra: {
-                    'task': task,
-                    'selectedDate': selectedDate,
-                  },
-                );
+                final timers = ref.read(taskTimerProvider);
+                final anyRunning = timers.values.any((t) => t.isRunning);
+                if (anyRunning) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Beende zuerst alle Timer, bevor du Änderungen vornehmen kannst.'),
+                    ),
+                  );
+                } else {
+                  ref.invalidate(taskTimerProvider); // 🧹 elapsed auf 0 setzen
+                  context.push(
+                    '/edit',
+                    extra: {
+                      'task': task,
+                      'selectedDate': selectedDate,
+                    },
+                  );
+                }
               }
             : null,
         );

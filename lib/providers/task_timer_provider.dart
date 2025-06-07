@@ -100,3 +100,8 @@ class TaskTimerNotifier extends StateNotifier<Map<String, TaskTimer>> {
 final taskTimerProvider = StateNotifierProvider<TaskTimerNotifier, Map<String, TaskTimer>>(
   (ref) => TaskTimerNotifier(),
 );
+
+final anyTimerRunningProvider = Provider<bool>((ref) {
+  final timers = ref.watch(taskTimerProvider);
+  return timers.values.any((t) => t.isRunning);
+});
