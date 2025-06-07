@@ -1,19 +1,36 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import {onDocumentWritten} from "firebase-functions/v2/firestore";
+import * as admin from "firebase-admin";
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+admin.initializeApp();
+const db = admin.firestore();
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+export const updateLoggedTime = onDocumentWritten(
+  "users/{userId}/{collectionName}/{taskId}/executions/{executionId}",
+  async (event) => {
+    const {userId, collectionName, taskId} = event.params;
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    const executionsSnapshot = await db
+      .collection(`users/${userId}/${collectionName}/${taskId}/executions`)
+      .get();
+
+    let totalDurationMs = 0;
+
+    executionsSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const start = data.start?.toDate?.() ?? new Date(data.start);
+      const end = data.end?.toDate?.() ?? new Date(data.end);
+      totalDurationMs += end.getTime() - start.getTime();
+    });
+
+    const totalMinutes = Math.floor(totalDurationMs / 60000);
+
+    await db
+      .collection(`users/${userId}/${collectionName}`)
+      .doc(taskId)
+      .update({loggedTime: totalMinutes});
+
+    console.log(
+      `Updated loggedTime for task ${taskId} to ${totalMinutes} minutes.`
+    );
+  }
+);
