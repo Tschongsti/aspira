@@ -70,10 +70,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () async {
+            final user = FirebaseAuth.instance.currentUser!;
+            final dummy = UserProfile.empty(user.uid, user.email ?? '');
+
             final updatedProfile = await context.push<UserProfile>(
               '/profile/edit',
-              extra: _userProfile,
+              extra: _userProfile ?? dummy,
             );
+
             if (updatedProfile is UserProfile) {
               setState(() {
                 _userProfile = updatedProfile;

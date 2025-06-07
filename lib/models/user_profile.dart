@@ -11,6 +11,15 @@ class UserProfile {
   final String? displayName;
   final String? photoUrl;
 
+  factory UserProfile.empty(String id, String email) {
+    return UserProfile(
+      id: id,
+      email: email,
+      displayName: '',
+      photoUrl: null,
+    );
+  }
+
   UserProfile copyWith({
     String? id,
     String? email,

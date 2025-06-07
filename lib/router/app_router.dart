@@ -123,8 +123,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/profile/edit',
-        builder: (context, state) {
-          final userProfile = state.extra as UserProfile;
+        builder: (context, state) {      
+          final userProfile = state.extra as UserProfile;          
           return ProfileEditScreen(userProfile: userProfile);
         },
       ),
