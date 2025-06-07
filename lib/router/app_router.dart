@@ -1,3 +1,4 @@
+import 'package:aspira/main.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/screens/edit_executions_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +30,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final routerNotifier = RouterNotifier(ref);
 
   return GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: '/splash',
     refreshListenable: routerNotifier,
     redirect: (context, state) {

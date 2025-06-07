@@ -95,12 +95,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Fixe Datumsleiste
             SizedBox(
               height: 60,
               child: Row(
                 children: weekDates.map((date) {
                   final isSelected = DateUtils.isSameDay(date, selectedDate);
-
                   return Expanded(
                     child: GestureDetector(
                       onTap: () => setState(() => selectedDate = date),
@@ -134,22 +134,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 24),
-            const Text("Tagesfokus", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 12),
-            _placeholderCard("Noch kein Fokus erfasst"),
-            const SizedBox(height: 24),
-            const Text("To-Do", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 12),
-            _placeholderCard("Keine To-Do's heute"),
-            const SizedBox(height: 24),
-            const Text("To-Relax", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 12),
-            _placeholderCard("Noch keine Pause eingeplant"),
-            const SizedBox(height: 24),
-            const Text("Tracking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 12),
-            TrackingSection(tasks: fokusForToday, selectedDate: selectedDate),
+            const SizedBox(height: 16),
+
+            // Scrollbarer Bereich
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Tagesfokus", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const SizedBox(height: 12),
+                    _placeholderCard("Noch kein Fokus erfasst"),
+                    const SizedBox(height: 24),
+                    const Text("To-Do", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const SizedBox(height: 12),
+                    _placeholderCard("Keine To-Do's heute"),
+                    const SizedBox(height: 24),
+                    const Text("To-Relax", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const SizedBox(height: 12),
+                    _placeholderCard("Noch keine Pause eingeplant"),
+                    const SizedBox(height: 24),
+                    const Text("Tracking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const SizedBox(height: 12),
+                    TrackingSection(tasks: fokusForToday, selectedDate: selectedDate),
+                    const SizedBox(height: 80), // Platz für BottomNavigationBar
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
