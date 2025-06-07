@@ -9,16 +9,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
-import 'package:aspira/models/task_timer.dart';
-import 'package:aspira/models/trackable_task.dart';
-import 'package:aspira/providers/timer_ticker_provider.dart';
-import 'package:aspira/providers/task_timer_provider.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
-import 'package:aspira/providers/daily_execution_provider.dart';
-import 'package:aspira/providers/weekly_sum_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
-import 'package:aspira/widgets/Homescreen/homescreen_task.dart';
+import 'package:aspira/widgets/Homescreen/tracking_section.dart';
 
 class HomeScreen extends ConsumerStatefulWidget{
   const HomeScreen ({super.key});
@@ -63,10 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final weekDates = getCurrentWeekDates();
     final monthYear = DateFormat('MMMM yyyy', 'de_CH').format(selectedDate);
-    bool isSameDay(DateTime a, DateTime b) {
-      return a.year == b.year && a.month == b.month && a.day == b.day;
-    }
-    
+        
     final config = AppScreenConfig(
       title: monthYear,
       showBottomNav: true,
@@ -94,7 +85,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final allFokus = ref.watch(userFokusActivitiesProvider);
     final fokusForToday = allFokus.where((fokus) =>
       fokus.status == Status.active &&
-      isSameDay(fokus.startDate, selectedDate)
+      !fokus.startDate.isAfter(selectedDate)
     ).toList();
 
     return AppScaffold(
@@ -158,70 +149,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 24),
             const Text("Tracking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 12),
-            fokusForToday.isEmpty
-              ? _placeholderCard("Keine Fokustätigkeit gestartet")
-              : Column(
-                  children: fokusForToday.map((task) {
-                    final timer = ref.watch(taskTimerProvider)[task.id];
-                    final isRunning = timer?.isRunning ?? false;
-                    final elapsed = timer?.elapsed ?? Duration.zero;
-                    final loggedTime = _computeLoggedTime(ref, task, selectedDate, elapsed);
-
-                    if (isRunning) {
-                      ref.watch(tickerProvider); // sekündlicher Widget rebuild (nur aktiv, wenn nötig)
-                    }
-                    
-                    return HomescreenTask(
-                      type: TaskType.timer,
-                      icon: Icon(Icons.access_time), // du kannst später task.iconName zu einem echten Icon mappen
-                      title: task.title,
-                      loggedTime: loggedTime,
-                      goalTime: task.weeklyGoal,
-                      isRunning: isRunning, // Platzhalter – wird später dynamisch sein
-                      onTapMainAction: () {
-                        final timerNotifier = ref.read(taskTimerProvider.notifier);
-                          if (isRunning) {
-                            timerNotifier.pauseTimer(task.id, task, context);
-                          } else if (timer?.status == TaskTimerStatus.paused) {
-                            timerNotifier.resumeTimer(task.id);
-                          } else {
-                            timerNotifier.startTimer(task.id);
-                          }
-                        },
-                      onEdit: () {
-                        // später für manuelle Bearbeitung
-                        debugPrint('Edit gedrückt für ${task.title}');
-                      },
-                    );
-                  }).toList(),
-                ),
+            TrackingSection(tasks: fokusForToday, selectedDate: selectedDate),
           ],
         ),
       ),
     );
-  }
-
-  Duration _computeLoggedTime(
-    WidgetRef ref,
-    TrackableTask task,
-    DateTime selectedDate,
-    Duration elapsed,
-  ) {
-    if (task is FokusTaetigkeit) {
-      final asyncWeekly = ref.watch(weeklySumProvider(task));
-      final weeklySum = asyncWeekly.value ?? Duration.zero;
-      return weeklySum + elapsed;
-    } else {
-      final startOfDay = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-      final asyncDaily = ref.watch(
-        dailyExecutionProvider((task: task, date: startOfDay)),
-      );
-      final dailySum = asyncDaily.value
-          ?.map((entry) => entry.duration)
-          .fold(Duration.zero, (a, b) => a + b) ?? Duration.zero;
-
-      return dailySum + elapsed;
-    }
   }
 
   Widget _placeholderCard(String text) {

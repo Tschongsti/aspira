@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 enum TaskType { task, quantity, timer }
 
@@ -10,7 +9,7 @@ class HomescreenTask extends StatelessWidget {
   final Duration loggedTime;
   final Duration goalTime;
   final bool isRunning;
-  final VoidCallback onTapMainAction;
+  final VoidCallback? onTapMainAction;
   final VoidCallback? onEdit;
 
   const HomescreenTask({
@@ -60,7 +59,8 @@ class HomescreenTask extends StatelessWidget {
               icon: const Icon(Icons.edit),
               onPressed: onEdit,
             ),
-          _buildMainActionButton(),
+          if (onTapMainAction != null)
+            _buildMainActionButton(),
         ],
       ),
     );
