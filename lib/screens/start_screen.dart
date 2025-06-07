@@ -37,11 +37,11 @@ class _StartScreenState extends State<StartScreen> {
         _isAuthenticating = true;
       });
       if (_isLogin) {
-        final userCredentials = await _firebase.signInWithEmailAndPassword(
+        await _firebase.signInWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword);
       } else {
-        final userCredentials = await _firebase.createUserWithEmailAndPassword(
+        await _firebase.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword);
 
@@ -60,6 +60,8 @@ class _StartScreenState extends State<StartScreen> {
         } else if (error.code == 'weak-password') {
           message = 'The password is too weak.';
         }
+
+        if (!mounted) return;
 
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -106,6 +108,7 @@ class _StartScreenState extends State<StartScreen> {
                               labelText: 'Email Address'
                             ),
                             keyboardType: TextInputType.emailAddress,
+                            maxLength: 60,
                             autocorrect: false,
                             textCapitalization: TextCapitalization.none,
                             validator: (value) {
@@ -125,6 +128,7 @@ class _StartScreenState extends State<StartScreen> {
                             decoration: const InputDecoration(
                               labelText: 'Password'
                             ),
+                            maxLength: 60,
                             obscureText: true,
                             validator: (value) {
                               if (value == null ||

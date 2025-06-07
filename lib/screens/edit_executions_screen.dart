@@ -143,6 +143,8 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.invalidate(weeklySumProvider(widget.task));
     }); 
+
+    if (!mounted) return;
     Navigator.of(context).pop();
   }
 

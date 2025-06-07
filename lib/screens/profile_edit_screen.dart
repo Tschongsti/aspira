@@ -28,7 +28,7 @@ class _UserProfileEditScreenState extends State<ProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
   late UserProfile? _userProfile;
   File? _profileImage;
-  bool _isLoading =true;
+  final bool _isLoading =true;
 
   @override
   void initState() {
@@ -79,7 +79,7 @@ class _UserProfileEditScreenState extends State<ProfileEditScreen> {
     final updatedProfile = _userProfile!.copyWith(photoUrl: photoUrl);
     await docRef.set(updatedProfile.toMap());
     
-    if (context.mounted) Navigator.of(context).pop(updatedProfile);
+    if (mounted) Navigator.of(context).pop(updatedProfile);
   }
 
   @override

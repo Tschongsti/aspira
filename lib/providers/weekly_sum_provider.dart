@@ -25,7 +25,7 @@ final weeklySumProvider = FutureProvider.family
       .map((doc) => ExecutionEntry.fromMap(doc.data()))
       .fold<Duration>(
         Duration.zero,
-        (sum, entry) => sum + entry.duration,
+        (currentTotal, entry) => currentTotal + entry.duration,
       );
 
   return total;
