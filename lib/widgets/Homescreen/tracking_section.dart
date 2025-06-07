@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/task_timer.dart';
@@ -60,8 +62,16 @@ class TrackingSection extends ConsumerWidget {
           isRunning: isRunning,
           onTapMainAction: onTap,
           onEdit: !selectedDate.isAfter(DateTime.now())
-              ? () => debugPrint('Edit gedrückt für ${task.title}')
-              : null,
+            ? () {
+                context.push(
+                  '/edit',
+                  extra: {
+                    'task': task,
+                    'selectedDate': selectedDate,
+                  },
+                );
+              }
+            : null,
         );
       }).toList(),
     );

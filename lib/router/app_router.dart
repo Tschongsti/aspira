@@ -1,4 +1,5 @@
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/screens/edit_executions_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/models/user_profile.dart';
+import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/visited_screens_provider.dart';
 import 'package:aspira/router/router_notifier.dart';
 import 'package:aspira/screens/start_screen.dart';
@@ -56,6 +58,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/edit',
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>;
+          final task = extras['task'] as TrackableTask;
+          final selectedDate = extras['selectedDate'] as DateTime;
+
+          return EditExecutionsScreen(
+            task: task,
+            selectedDate: selectedDate,
+          );
+        },
       ),
       GoRoute(
         path: '/effektivitaet',
