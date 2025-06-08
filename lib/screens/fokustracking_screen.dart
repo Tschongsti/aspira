@@ -66,18 +66,20 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
               notifier.deleteFokustaetigkeit(fokus, context);
 
               ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
-                SnackBar(
-                  duration: const Duration(seconds: 3),
-                  content: const Text('Fokus-Tätigkeit gelöscht.'),
-                  action: SnackBarAction(
-                    label: 'Wiederherstellen',
-                    onPressed: () {
-                      notifier.insertAt(index, fokus, context);
-                    },
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+                  SnackBar(
+                    duration: const Duration(seconds: 3),
+                    content: const Text('Fokus-Tätigkeit gelöscht.'),
+                    action: SnackBarAction(
+                      label: 'Wiederherstellen',
+                      onPressed: () {
+                        notifier.insertAt(index, fokus, context);
+                      },
+                    ),
                   ),
-                ),
-              );
+                );
+              });
             },
           );
 

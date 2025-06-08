@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+// import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';

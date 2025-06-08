@@ -68,6 +68,7 @@ class _StartScreenState extends State<StartScreen> {
           SnackBar(content: Text(message),
           ),
         );
+        
         setState(() {
           _isAuthenticating = false;
         });

@@ -28,8 +28,8 @@ class _UserProfileEditScreenState extends State<ProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
   late UserProfile? _userProfile;
   File? _profileImage;
-  final bool _isLoading =true;
-
+  // bool _isLoading = true;
+  
   @override
   void initState() {
     super.initState();
@@ -94,9 +94,9 @@ class _UserProfileEditScreenState extends State<ProfileEditScreen> {
       ],
     );
     
-    if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    // if (_isLoading) {
+    //  return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    // }
 
     final validPhotoUrl = _userProfile?.photoUrl != null && _userProfile!.photoUrl!.startsWith('http');
     

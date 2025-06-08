@@ -18,6 +18,7 @@ var kDarkColorScheme = ColorScheme.fromSeed(
 );
 
 final container = ProviderContainer();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +33,7 @@ void main() async {
     UncontrolledProviderScope(
       container: container,
       child: ProviderScope(
-        child: AspiraApp(),
+        child: AspiraApp(navigatorKey: navigatorKey),
       ),
     ),
   );
@@ -40,7 +41,12 @@ void main() async {
 }
 
 class AspiraApp extends ConsumerWidget {
-  const AspiraApp({super.key});
+  const AspiraApp({
+    required this.navigatorKey,
+    super.key
+    });
+
+  final GlobalKey<NavigatorState> navigatorKey; 
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
