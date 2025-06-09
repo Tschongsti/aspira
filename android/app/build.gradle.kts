@@ -1,7 +1,7 @@
 import java.util.Properties
 
 val keystoreProperties = Properties().apply {
-    load(file("android/key.properties").inputStream())
+    load(file("key.properties").inputStream())
 }
 
 plugins {
@@ -40,19 +40,19 @@ android {
     }
     
     signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }   
     }
 
     buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            shrinkResources false
-            minifyEnabled false
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
