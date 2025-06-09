@@ -11,7 +11,7 @@ Future<Database> getDatabase() async {
     version: 1,
     onCreate: (db, version) async {
       await db.execute('''
-        CREATE TABLE user_focusactivities(
+        CREATE TABLE IF NOT EXISTS user_focusactivities(
           id TEXT PRIMARY KEY,
           title TEXT,
           description TEXT,
@@ -19,10 +19,14 @@ Future<Database> getDatabase() async {
           weeklyGoal INTEGER,
           startDate TEXT,
           loggedTime INTEGER,
-          status TEXT)
+          status TEXT,
+          updatedAt TEXT,
+          isDirty INTEGER,
+          type TEXT
+        );
       ''');
       await db.execute('''
-        CREATE TABLE visited_screens(
+        CREATE TABLE IF NOT EXISTS visited_screens(
           screenId TEXT PRIMARY KEY
         );
       ''');  
