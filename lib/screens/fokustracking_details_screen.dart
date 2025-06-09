@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
 
 
@@ -57,6 +58,8 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       status: widget.initialData!.status == Status.active
           ? Status.inactive
           : Status.active,
+      updatedAt: DateTime.now(),
+      isDirty: true,
     );
 
     try {
@@ -94,13 +97,15 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       iconName: _selectedIcon,
       weeklyGoal: Duration(minutes: _weeklyGoal),
       status: widget.initialData?.status ?? Status.active,
+      updatedAt: DateTime.now(),
+      isDirty: true,
     );
 
     final notifier = ref.read(userFokusActivitiesProvider.notifier);
 
     try {
       if (widget.initialData == null) {
-        await notifier.addFokusTaetigkeit(updated, context);
+        await notifier.addFokusTaetigkeit(updated);
       } else {
         final changedWeeklyGoal = updated.weeklyGoal != widget.initialData!.weeklyGoal;
         await notifier.updateFokusTaetigkeit(updated, versionGoal: changedWeeklyGoal);

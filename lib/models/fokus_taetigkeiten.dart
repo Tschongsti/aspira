@@ -101,6 +101,7 @@ class FokusTaetigkeit extends TrackableTask {
   }
 
   FokusTaetigkeit copyWith({
+    String? id,
     String? title,
     String? description,
     IconName? iconName,
@@ -112,7 +113,7 @@ class FokusTaetigkeit extends TrackableTask {
     Duration? weeklyGoal,
   }) {
     return FokusTaetigkeit(
-      id: id,
+      id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
       iconName: iconName ?? this.iconName,
