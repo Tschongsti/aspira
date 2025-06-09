@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sqflite/sqflite.dart';
 
+import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/data/database.dart';
 
@@ -15,7 +16,10 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
       final db = await getDatabase();
       final data = await db.query('user_focusactivities');
 
-      final fokusList = data.map((row) => FokusTaetigkeit.fromLocalMap(row)).toList();
+      final fokusList = data
+        .map((row) => FokusTaetigkeit.fromLocalMap(row))
+        .where((item) => item.status == Status.active && !item.isArchived)
+        .toList();
       state = fokusList;
     } catch (e, st) {
       debugPrint('🛑 Fehler beim Laden der Fokustätigkeiten: $e');
@@ -50,6 +54,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         final timestamp = DateTime.now().toIso8601String();
         final archived = updated.copyWith(
           id: '${updated.id}_$timestamp',
+          isArchived: true,
           updatedAt: DateTime.now(),
           isDirty: true,
         );

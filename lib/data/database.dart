@@ -19,6 +19,7 @@ Future<Database> getDatabase() async {
           weeklyGoal INTEGER,
           startDate TEXT,
           loggedTime INTEGER,
+          isArchived INTEGER,
           status TEXT,
           updatedAt TEXT,
           isDirty INTEGER,

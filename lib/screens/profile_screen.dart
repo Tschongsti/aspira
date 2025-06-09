@@ -51,14 +51,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }   
   
-  Future<void> _resetVisitedScreens(BuildContext context) async {
+  Future<void> _resetLocalDatabase(BuildContext context) async {
     final db = await getDatabase();
+
     await db.delete('visited_screens');
+    await db.delete('user_focusactivities');
+    // später ggf. ergänzen: 'user_habits', 'user_todos', 'user_relax', usw.
 
     if (!context.mounted) return;
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('visited_screens-Tabelle wurde zurückgesetzt')),
+      const SnackBar(content: Text('Lokale Datenbank wurde zurückgesetzt')),
     );
   }
 
@@ -145,14 +148,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 32),
           // 🛠️ Dev-Reset-Button
           OutlinedButton.icon(
-            onPressed: () => _resetVisitedScreens(context),
+            onPressed: () => _resetLocalDatabase(context),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
               backgroundColor: Colors.redAccent,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 60),
             ),
             icon: const Icon(Icons.delete_forever),
-            label: const Text('Visited Screens resetten'),
+            label: const Text('Reset Local Database'),
           ),
         ],
       ),
