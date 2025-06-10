@@ -1,62 +1,28 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/data/database.dart'; // notwendig für Reset Visited Screens
 import 'package:aspira/models/user_profile.dart';
+import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  UserProfile? _userProfile;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
-
-  Future<void> _loadUserProfile() async {
-    final user = FirebaseAuth.instance.currentUser!;
-    final docRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('user_profile')
-        .doc('main');
-
-    try {
-      final snapshot = await docRef.get();
-      if (snapshot.exists) {
-        setState(() {
-          _userProfile = UserProfile.fromMap(user.uid, snapshot.data()!);
-        });
-      }
-    } catch (error) {
-      debugPrint('Fehler loadUserProfile: $error');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }   
-  
   Future<void> _resetLocalDatabase(BuildContext context) async {
     final db = await getDatabase();
 
     await db.delete('visited_screens');
     await db.delete('user_focusactivities');
     await db.delete('execution_entries');
+    await db.delete('user_profile');
     // später ggf. ergänzen: 'user_habits', 'user_todos', 'user_relax', usw.
 
     if (!context.mounted) return;
@@ -67,7 +33,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(userProfileProvider);
+    
     final config = AppScreenConfig(
       title: 'Mein Profil',
       appBarActions: [
@@ -79,20 +47,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             final updatedProfile = await context.push<UserProfile>(
               '/profile/edit',
-              extra: _userProfile ?? dummy,
+              extra: profile ?? dummy,
             );
 
-            if (updatedProfile is UserProfile) {
-              setState(() {
-                _userProfile = updatedProfile;
-              });
-            }
+            if (updatedProfile != null) {
+              await ref.read(userProfileProvider.notifier).saveProfile(updatedProfile);
+              }
           },
         ),
       ],
     );
     
-    if (_isLoading) {
+    if (profile == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
@@ -113,10 +79,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: CircleAvatar(
                   radius: 48,
-                  backgroundImage: _userProfile?.photoUrl != null 
-                    ? NetworkImage(_userProfile!.photoUrl!)
+                  backgroundImage: profile.photoUrl != null 
+                    ? NetworkImage(profile.photoUrl!)
                     : null,
-                  child: _userProfile?.photoUrl == null 
+                  child: profile.photoUrl == null 
                     ? const Icon(Icons.person, size: 32) 
                     : null,
                 ),
@@ -124,8 +90,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  _userProfile?.displayName?.isNotEmpty == true
-                      ? _userProfile!.displayName!
+                  profile.displayName?.isNotEmpty == true
+                      ? profile.displayName!
                       : 'Kein Name gesetzt',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
