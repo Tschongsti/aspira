@@ -10,6 +10,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:aspira/data/database.dart';
 import 'package:aspira/models/execution_entry.dart';
 import 'package:aspira/models/trackable_task.dart';
+import 'package:aspira/providers/weekly_sum_provider.dart';
+import 'package:aspira/providers/total_logged_time_provicder.dart';
 
 class EditExecutionsScreen extends ConsumerStatefulWidget {
   final TrackableTask task;
@@ -75,17 +77,29 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
   }
   
   bool _validate() {
-    final now = DateTime.now().toLocal();
-    for (final entry in _entries) {
-      if (entry.start.isAfter(entry.end)) return false;
-      if (entry.end.isAfter(now)) return false;
+    final now = DateTime.now();
+
+    for (int i = 0; i < _entries.length; i++) {
+      final a = _entries[i];
+
+      if (a.start.isAfter(a.end)) return false;
+      if (a.end.isAfter(now)) return false;
+
+      for (int j = i + 1; j < _entries.length; j++) {
+        final b = _entries[j];
+
+        final overlap = a.start.isBefore(b.end) && a.end.isAfter(b.start);
+        if (overlap) return false;
+      }
     }
     return true;
   }
 
   Future<void> _save() async {
     if (!_validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ungültige Zeiten.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+        'Ungültige Eingabe. Ausführungen können nicht in der Zukunft sein und dürfen sich nicht überschneiden'
+      )));
       return;
     }
 
@@ -118,6 +132,9 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
     }
 
     await batch.commit(noResult: true);
+    
+    ref.invalidate(weeklySumProvider(widget.task)); // Provider invaldieren, damit Homescreen neue Daten lädt
+    ref.invalidate(totalLoggedTimeProvider(widget.task.id));
 
     if (!mounted) return;
     Navigator.of(context).pop();
