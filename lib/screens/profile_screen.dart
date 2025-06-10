@@ -56,6 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     await db.delete('visited_screens');
     await db.delete('user_focusactivities');
+    await db.delete('execution_entries');
     // später ggf. ergänzen: 'user_habits', 'user_todos', 'user_relax', usw.
 
     if (!context.mounted) return;

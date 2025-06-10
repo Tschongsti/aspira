@@ -21,9 +21,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         .where((item) => item.status == Status.active && !item.isArchived)
         .toList();
       state = fokusList;
-    } catch (e, st) {
-      debugPrint('🛑 Fehler beim Laden der Fokustätigkeiten: $e');
-      debugPrintStack(stackTrace: st);
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Laden der Fokustätigkeiten: $error');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 
@@ -37,9 +37,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       state = [fokus, ...state];
-    } catch (e, st) {
-      debugPrint('🛑 Fehler beim Hinzufügen: $e');
-      debugPrintStack(stackTrace: st);
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Hinzufügen: $error');
+      debugPrintStack(stackTrace: stackTrace);
       state = previousState;
     }
   }
@@ -82,9 +82,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         state = newList;
       }
 
-    } catch (e, st) {
-      debugPrint('🛑 Fehler beim Update: $e');
-      debugPrintStack(stackTrace: st);
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Update: $error');
+      debugPrintStack(stackTrace: stackTrace);
       state = previousState;
     }
   }
@@ -99,9 +99,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         whereArgs: [id],
       );
       state = [...state]..removeWhere((item) => item.id == id);
-    } catch (e, st) {
-      debugPrint('🛑 Fehler beim Löschen: $e');
-      debugPrintStack(stackTrace: st);
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Löschen: $error');
+      debugPrintStack(stackTrace: stackTrace);
       state = previousState;
     }
   }
@@ -119,9 +119,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
       final newList = [...state];
       newList.insert(index, fokus);
       state = newList;
-    } catch (e, st) {
-      debugPrint('🛑 Fehler beim Einfügen an Position: $e');
-      debugPrintStack(stackTrace: st);
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Einfügen an Position: $error');
+      debugPrintStack(stackTrace: stackTrace);
       state = previousState;
     }
   }
@@ -131,9 +131,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
       final db = await getDatabase();
       await db.delete('user_focusactivities');
       state = [];
-    } catch (e, st) {
-      debugPrint('🛑 Fehler beim Leeren: $e');
-      debugPrintStack(stackTrace: st);
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Leeren: $error');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
 }

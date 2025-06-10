@@ -27,6 +27,17 @@ Future<Database> getDatabase() async {
         );
       ''');
       await db.execute('''
+        CREATE TABLE IF NOT EXISTS execution_entries(
+          id TEXT PRIMARY KEY,
+          taskId TEXT,
+          start TEXT,
+          end TEXT,
+          isDirty INTEGER,
+          updatedAt TEXT,
+          isArchived INTEGER
+        );
+      ''');
+      await db.execute('''
         CREATE TABLE IF NOT EXISTS visited_screens(
           screenId TEXT PRIMARY KEY
         );
