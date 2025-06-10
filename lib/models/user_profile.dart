@@ -4,12 +4,16 @@ class UserProfile {
     required this.email,
     this.displayName,
     this.photoUrl,
-  });
+    this.isDirty = true,
+    DateTime? updatedAt,
+  }) : updatedAt = updatedAt ?? DateTime.now();
 
   final String id;
   final String email;
   final String? displayName;
   final String? photoUrl;
+  final bool isDirty;
+  final DateTime updatedAt;
 
   factory UserProfile.empty(String id, String email) {
     return UserProfile(
@@ -25,22 +29,28 @@ class UserProfile {
     String? email,
     String? displayName,
     String? photoUrl,
+    bool? isDirty,
+    DateTime? updatedAt,
   }) {
     return UserProfile(
       id: id ?? this.id,
       email: email ?? this.email,
       displayName: displayName ?? this.displayName,
       photoUrl: photoUrl ?? this.photoUrl,
+      isDirty: isDirty ?? this.isDirty,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
   /// Factory-Methode zum Erstellen aus einem Firestore-Dokument
-  factory UserProfile.fromMap(String id, Map<String, dynamic> data) {
+  factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(
-      id: id,
-      email: data['email'] as String,
-      displayName: data['displayName'] as String,
-      photoUrl: data['photoUrl'] as String?,
+      id: map['id'],
+      email: map['email'],
+      displayName: map['displayName'],
+      photoUrl: map['photoUrl'],
+      isDirty: (map['isDirty'] ?? 1) == 1,
+      updatedAt: DateTime.parse(map['updatedAt']),
     );
   }
 
@@ -50,7 +60,9 @@ class UserProfile {
       'id': id,
       'email': email,
       'displayName': displayName,
-      if (photoUrl != null) 'photoUrl': photoUrl,
+      'photoUrl': photoUrl,
+      'isDirty': isDirty ? 1 : 0,
+      'updatedAt': updatedAt.toLocal().toIso8601String(),
     };
   }
 }

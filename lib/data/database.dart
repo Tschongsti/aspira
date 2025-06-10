@@ -38,6 +38,16 @@ Future<Database> getDatabase() async {
         );
       ''');
       await db.execute('''
+        CREATE TABLE IF NOT EXISTS user_profile (
+          id TEXT PRIMARY KEY,
+          email TEXT NOT NULL,
+          displayName TEXT,
+          photoUrl TEXT,
+          isDirty INTEGER NOT NULL,
+          updatedAt TEXT NOT NULL
+        );
+      ''');
+      await db.execute('''
         CREATE TABLE IF NOT EXISTS visited_screens(
           screenId TEXT PRIMARY KEY
         );
