@@ -12,6 +12,8 @@ import 'package:aspira/models/execution_entry.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/weekly_sum_provider.dart';
 import 'package:aspira/providers/total_logged_time_provicder.dart';
+import 'package:aspira/utils/appscreenconfig.dart';
+import 'package:aspira/utils/appscaffold.dart';
 
 class EditExecutionsScreen extends ConsumerStatefulWidget {
   final TrackableTask task;
@@ -165,17 +167,22 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.task.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _save,
-          ),
-        ],
-      ),
-      body: _isLoading
+    
+    final config = AppScreenConfig(
+      title: 'Ausführungen ${widget.task.title.toString()}',
+      showBottomNav: false,
+      showAppBar: true,
+      appBarActions: [
+        IconButton(
+          icon: const Icon(Icons.save),
+          onPressed: _save,
+        ),
+      ],
+    );
+    
+    return AppScaffold(
+      config: config,  
+      child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
@@ -207,13 +214,14 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12),
                   child: ElevatedButton.icon(
                     onPressed: _addEntry,
                     icon: const Icon(Icons.add),
                     label: const Text('Neue Ausführung hinzufügen'),
                   ),
                 ),
+                SizedBox(height: 16),
               ],
             ),
     );
