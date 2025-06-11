@@ -1,4 +1,3 @@
-import 'package:aspira/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,10 +64,14 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
 
               notifier.deleteFokusTaetigkeit(fokus.id);
 
-              ScaffoldMessenger.of(context).clearSnackBars();
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+                if (!context.mounted) return;
+                
+                ScaffoldMessenger.of(context)
+                ..clearMaterialBanners()
+                ..showSnackBar(
                   SnackBar(
+                    behavior: SnackBarBehavior.floating,
                     duration: const Duration(seconds: 3),
                     content: const Text('Fokus-Tätigkeit gelöscht.'),
                     action: SnackBarAction(
