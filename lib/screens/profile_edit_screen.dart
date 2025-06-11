@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/providers/user_profile_provider.dart';
@@ -38,13 +39,38 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   }
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.camera); // oder .gallery
+    final status = await Permission.camera.request();
 
-    if (picked != null) {
-      setState(() {
-        _profileImage = File(picked.path);
-      });
+    if (!mounted) return; // Kontext-Schutz
+
+    if (status.isGranted) {    
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.camera); // oder .gallery
+
+      if (picked != null) {
+        setState(() {
+          _profileImage = File(picked.path);
+        });
+      }
+    } else if (status.isPermanentlyDenied) {
+      // Zeige Dialog, um User zur Einstellungsseite zu führen
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Kamerazugriff benötigt'),
+          content: const Text('Bitte erlaube den Kamerazugriff in den Einstellungen.'),
+          actions: [
+            TextButton(
+              onPressed: () => openAppSettings(),
+              child: const Text('Einstellungen öffnen'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Abbrechen'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
