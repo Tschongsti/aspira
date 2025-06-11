@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/data/database.dart'; // notwendig für Reset Visited Screens
@@ -34,20 +33,20 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(userProfileProvider);
-    
+    final profileAsync = ref.watch(userProfileProvider);
+    final user = FirebaseAuth.instance.currentUser!;
+    final dummyProfile = UserProfile.empty(user.uid, user.email ?? '');
+
     final config = AppScreenConfig(
       title: 'Mein Profil',
       appBarActions: [
         IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () async {
-            final user = FirebaseAuth.instance.currentUser!;
-            final dummy = UserProfile.empty(user.uid, user.email ?? '');
-
+            final currentProfile = profileAsync.value ?? dummyProfile;
             final updatedProfile = await context.push<UserProfile>(
               '/profile/edit',
-              extra: profile ?? dummy,
+              extra: currentProfile,
             );
 
             if (updatedProfile != null) {
@@ -58,11 +57,15 @@ class ProfileScreen extends ConsumerWidget {
       ],
     );
     
-    if (profile == null) {
-      return const Scaffold(
+    return profileAsync.when(
+      loading: () => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
-      );
-    }
+      ),
+      error: (error, _) => Scaffold(
+        body: Center(child: Text('Fehler beim Laden: $error')),
+      ),
+      data: (profile) {
+        final effectiveProfile = profile ?? dummyProfile;
 
     return AppScaffold(
       config: config,
@@ -79,10 +82,10 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 child: CircleAvatar(
                   radius: 48,
-                  backgroundImage: profile.photoUrl != null 
-                    ? NetworkImage(profile.photoUrl!)
+                  backgroundImage: effectiveProfile.photoUrl != null 
+                    ? NetworkImage(effectiveProfile.photoUrl!)
                     : null,
-                  child: profile.photoUrl == null 
+                  child: effectiveProfile.photoUrl == null 
                     ? const Icon(Icons.person, size: 32) 
                     : null,
                 ),
@@ -90,8 +93,8 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  profile.displayName?.isNotEmpty == true
-                      ? profile.displayName!
+                  effectiveProfile.displayName?.isNotEmpty == true
+                      ? effectiveProfile.displayName!
                       : 'Kein Name gesetzt',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
@@ -127,5 +130,6 @@ class ProfileScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-}
+  },
+);
+}}

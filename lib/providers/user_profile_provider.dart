@@ -5,16 +5,23 @@ import 'package:sqflite/sqflite.dart';
 import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/data/database.dart';
 
-class UserProfileNotifier extends StateNotifier<UserProfile?> {
-  UserProfileNotifier() : super(null) {
+class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
+  UserProfileNotifier() : super(const AsyncLoading()) {
     loadProfile();
   }
 
   Future<void> loadProfile() async {
-    final db = await getDatabase();
-    final result = await db.query('user_profile', limit: 1);
+    try {
+      final db = await getDatabase();
+      final result = await db.query('user_profile', limit: 1);
+
     if (result.isNotEmpty) {
-      state = UserProfile.fromMap(result.first);
+      state = AsyncValue.data(UserProfile.fromMap(result.first));
+    } else {
+      state = const AsyncValue.data(null);
+    }
+    } catch (error, stack) {
+      state = AsyncValue.error(error, stack);
     }
   }
 
@@ -29,10 +36,10 @@ class UserProfileNotifier extends StateNotifier<UserProfile?> {
       updated.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    state = updated;
+    state = AsyncValue.data(updated);
   }
 }
 
-final userProfileProvider = StateNotifierProvider<UserProfileNotifier, UserProfile?>(
+final userProfileProvider = StateNotifierProvider<UserProfileNotifier, AsyncValue<UserProfile?>>(
   (ref) => UserProfileNotifier(),
 );

@@ -1,18 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:image_picker/image_picker.dart';
 
 import 'package:aspira/models/user_profile.dart';
+import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 
-class ProfileEditScreen extends StatefulWidget {
+class ProfileEditScreen extends ConsumerStatefulWidget {
   const ProfileEditScreen({
     super.key,
     required this.userProfile,
@@ -21,10 +22,10 @@ class ProfileEditScreen extends StatefulWidget {
   final UserProfile userProfile;
 
   @override
-  State<ProfileEditScreen> createState() => _UserProfileEditScreenState();
+  ConsumerState<ProfileEditScreen> createState() => _UserProfileEditScreenState();
 }
 
-class _UserProfileEditScreenState extends State<ProfileEditScreen> {
+class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
   late UserProfile? _userProfile;
   File? _profileImage;
@@ -47,14 +48,8 @@ class _UserProfileEditScreenState extends State<ProfileEditScreen> {
     }
   }
 
-  void _saveProfile() async {
+  Future<void> _saveProfile() async {
     final user = FirebaseAuth.instance.currentUser!;
-    final docRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('user_profile')
-        .doc('main');
-
     final isValid = _formKey.currentState!.validate();
     if (!isValid) return;
 
@@ -77,7 +72,8 @@ class _UserProfileEditScreenState extends State<ProfileEditScreen> {
     }
 
     final updatedProfile = _userProfile!.copyWith(photoUrl: photoUrl);
-    await docRef.set(updatedProfile.toMap());
+    
+    await ref.read(userProfileProvider.notifier).saveProfile(updatedProfile);
     
     if (mounted) Navigator.of(context).pop(updatedProfile);
   }
