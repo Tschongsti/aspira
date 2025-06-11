@@ -6,7 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
-
+import 'package:aspira/utils/appscreenconfig.dart';
+import 'package:aspira/utils/appscaffold.dart';
 
 class FokustrackingDetailsScreen extends ConsumerStatefulWidget {
   const FokustrackingDetailsScreen({
@@ -144,15 +145,17 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
     final isEditMode = widget.initialData != null;
     final isInactive = widget.initialData?.status == Status.inactive;
     
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          isEditMode
+    final config = AppScreenConfig(
+      title: isEditMode
             ? 'Fokustätigkeit bearbeiten'
-            : 'Fokustätigkeit hinzufügen'
-        ),
-      ),
-      body: Padding(
+            : 'Fokustätigkeit hinzufügen',
+      showBottomNav: false,
+      showAppBar: true,
+    );
+
+    return AppScaffold(
+      config: config,
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,

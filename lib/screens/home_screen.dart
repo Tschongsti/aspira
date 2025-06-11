@@ -46,15 +46,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setupPushNotifications();
   } 
 
-  List<DateTime> getCurrentWeekDates() {
-    final today = DateTime.now();
-    final monday = today.subtract(Duration(days: today.weekday - 1));
+  List<DateTime> getWeekDates(DateTime reference) {
+    final monday = reference.subtract(Duration(days: reference.weekday - 1));
     return List.generate(7, (index) => monday.add(Duration(days: index)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final weekDates = getCurrentWeekDates();
+    final weekDates = getWeekDates(selectedDate);
     final monthYear = DateFormat('MMMM yyyy', 'de_CH').format(selectedDate);
         
     final config = AppScreenConfig(
@@ -98,39 +97,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SizedBox(
               height: 60,
               child: Row(
-                children: weekDates.map((date) {
-                  final isSelected = DateUtils.isSameDay(date, selectedDate);
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => selectedDate = date),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.purple : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              DateFormat('E', 'de_CH').format(date),
-                              style: TextStyle(color: isSelected ? Colors.white : Colors.black),
-                            ),
-                            Text(
-                              '${date.day}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.white : Colors.black,
+                children: [
+                  // ⬅️ Zurück-Button
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left, size: 20),
+                    visualDensity: VisualDensity.compact, // reduziert Padding
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(), // entfernt Standard-Mindestgrösse
+                    onPressed: () {
+                      setState(() {
+                        selectedDate = selectedDate.subtract(const Duration(days: 7));
+                      });
+                    },
+                  ),
+                  // Datums-Auswahl
+                  ...weekDates.map((date) {
+                    final isSelected = DateUtils.isSameDay(date, selectedDate);
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => selectedDate = date),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.purple : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                DateFormat('E', 'de_CH').format(date),
+                                style: TextStyle(color: isSelected ? Colors.white : Colors.black),
                               ),
-                            ),
-                          ],
+                              Text(
+                                '${date.day}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }),
+                  // ➡️ Vorwärts-Button
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right, size: 20),
+                    visualDensity: VisualDensity.compact, // reduziert Padding
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(), // entfernt Standard-Mindestgrösse
+                    onPressed: () {
+                      setState(() {
+                        selectedDate = selectedDate
+                            .add(const Duration(days: 7))
+                            .subtract(Duration(days: selectedDate.weekday - 1)); // auf Montag setzen
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),

@@ -167,7 +167,6 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     final config = AppScreenConfig(
       title: 'Ausführungen ${widget.task.title.toString()}',
       showBottomNav: false,
