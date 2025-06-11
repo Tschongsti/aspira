@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 
-import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/widgets/fokustracking/fokustracking_list.dart';
@@ -63,7 +63,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
               final notifier = ref.read(userFokusActivitiesProvider.notifier);
               final index = fokusTaetigkeiten.indexOf(fokus);
 
-              notifier.deleteFokustaetigkeit(fokus, context);
+              notifier.deleteFokusTaetigkeit(fokus.id);
 
               ScaffoldMessenger.of(context).clearSnackBars();
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -74,7 +74,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
                     action: SnackBarAction(
                       label: 'Wiederherstellen',
                       onPressed: () {
-                        notifier.insertAt(index, fokus, context);
+                        notifier.insertAt(index, fokus);
                       },
                     ),
                   ),

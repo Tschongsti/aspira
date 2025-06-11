@@ -1,19 +1,14 @@
-import 'package:aspira/models/trackable_task.dart';
 import 'package:flutter/material.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:duration/duration.dart';
 
+import 'package:aspira/models/trackable_task.dart';
+
 final formatter = DateFormat('dd.MM.yyyy');
 
 const uuid = Uuid();
-
-enum Status { active, inactive, deleted }
-
-enum IconName { landscape, diversity_3, favorite}
 
 const categoryIcons = {
   IconName.landscape: Icons.landscape,
@@ -21,32 +16,31 @@ const categoryIcons = {
   IconName.favorite: Icons.favorite,
 };
 
-class FokusTaetigkeit implements TrackableTask {
+class FokusTaetigkeit extends TrackableTask {
+  final Duration weeklyGoal;
+  
   FokusTaetigkeit({
-    required this.title,
-    required this.description,
-    required this.iconName,
+    required super.title,
+    required super.description,
+    required super.iconName,
     required this.weeklyGoal,
     String? id,
     DateTime? startDate,
     Duration? loggedTime,
+    bool? isArchived,
     Status? status,
-    }) : 
-    id = id ?? uuid.v4(),
-    startDate = startDate ?? DateTime.now(),
-    loggedTime = loggedTime ?? Duration.zero,
-    status = status ?? Status.active;
-
-  @override
-  final String id;
-  @override
-  final String title;
-  final String description;
-  final IconName iconName;
-  final Duration weeklyGoal;
-  final DateTime startDate;
-  final Duration loggedTime;
-  final Status status;
+    DateTime? updatedAt,
+    bool? isDirty,
+    }) : super( 
+      id: id ?? uuid.v4(),
+      startDate: startDate ?? DateTime.now(),
+      status: status ?? Status.active,
+      loggedTime: loggedTime ?? Duration.zero,
+      isArchived: isArchived ?? false,
+      updatedAt: updatedAt ?? DateTime.now(),
+      isDirty: isDirty ?? true,
+      type: Type.time,
+    );
 
   @override
   String get parentCollection => 'fokus_activities';
@@ -70,50 +64,71 @@ class FokusTaetigkeit implements TrackableTask {
     );
   }
 
-  Map<String, dynamic> toFirebaseMap() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'iconName': iconName.name,
-      'weeklyGoal': weeklyGoal.inMinutes,
-      'startDate': Timestamp.fromDate(startDate),
-      'loggedTime': loggedTime.inMinutes,
-      'status': status.name,
-    };
-  }
-
+  @override
   Map<String, dynamic> toLocalMap() {
     return {
       'id': id,
       'title': title,
       'description': description,
       'iconName': iconName.name,
-      'weeklyGoal': weeklyGoal.inMinutes,
       'startDate': startDate.toLocal().toIso8601String(),
-      'loggedTime': loggedTime.inMinutes,
       'status': status.name,
+      'loggedTime': loggedTime.inMinutes,
+      'isArchived': isArchived ? 1 : 0,
+      'updatedAt': updatedAt.toLocal().toIso8601String(),
+      'isDirty': isDirty ? 1 : 0,
+      'type': type.name,
+      'weeklyGoal': weeklyGoal.inMinutes,
     };
   }
 
-  factory FokusTaetigkeit.fromMap(Map<String, dynamic> map) {
+  factory FokusTaetigkeit.fromLocalMap(Map<String, dynamic> map) {
     return FokusTaetigkeit(
       id: map['id'],
       title: map['title'],
-      description: map['description'],
+      description: map['description'] ?? '',
       iconName: IconName.values.firstWhere(
         (error) => error.name == map['iconName'],
-        orElse: () => IconName.favorite, // fallback
+        orElse: () => IconName.favorite, // Fallback
       ),
-      weeklyGoal: Duration(minutes: map['weeklyGoal']),
-      startDate:map['startDate'] is Timestamp
-        ? (map['startDate'] as Timestamp).toDate()
-        : DateTime.parse(map['startDate']),
-      loggedTime: Duration(minutes: map['loggedTime']),
+      startDate: DateTime.parse(map['startDate']),
       status: Status.values.firstWhere(
         (error) => error.name == map['status'],
-        orElse: () => Status.active, // fallback
+        orElse: () => Status.active,
       ),
+      loggedTime: Duration(minutes: map['loggedTime'] ?? 0),
+      isArchived: (map['isArchived'] ?? 0) == 1,
+      updatedAt: DateTime.parse(map['updatedAt']),
+      isDirty: map['isDirty'] == 1,
+      weeklyGoal: Duration(minutes: map['weeklyGoal'] ?? 0),
+    );
+  }
+
+  FokusTaetigkeit copyWith({
+    String? id,
+    String? title,
+    String? description,
+    IconName? iconName,
+    DateTime? startDate,
+    Status? status,
+    Duration? loggedTime,
+    bool? isArchived,
+    DateTime? updatedAt,
+    bool? isDirty,
+    Duration? weeklyGoal,
+  }) {
+    return FokusTaetigkeit(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      iconName: iconName ?? this.iconName,
+      startDate: startDate ?? this.startDate,
+      status: status ?? this.status,
+      loggedTime: loggedTime ?? this.loggedTime,
+      isArchived: isArchived ?? this.isArchived,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDirty: isDirty ?? this.isDirty,
+      weeklyGoal: weeklyGoal ?? this.weeklyGoal,
     );
   }
 

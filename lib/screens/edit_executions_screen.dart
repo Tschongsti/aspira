@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:sqflite/sqflite.dart';
+
+import 'package:aspira/data/database.dart';
 import 'package:aspira/models/execution_entry.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/weekly_sum_provider.dart';
-import 'package:aspira/utils/get_current_user.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:aspira/providers/total_logged_time_provicder.dart';
 
 class EditExecutionsScreen extends ConsumerStatefulWidget {
   final TrackableTask task;
@@ -30,22 +34,18 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
   }
 
   Future<void> _loadExecutions() async {
-    final user = getCurrentUserOrThrow();
+    final db = await getDatabase();
     final start = DateTime(widget.selectedDate.year, widget.selectedDate.month, widget.selectedDate.day);
     final end = start.add(Duration(days: 1)).subtract(Duration(milliseconds: 1));
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection(widget.task.parentCollection)
-        .doc(widget.task.id)
-        .collection('executions')
-        .where('start', isGreaterThanOrEqualTo: Timestamp.fromDate(start))
-        .where('start', isLessThanOrEqualTo: Timestamp.fromDate(end))
-        .get();
+    final data = await db.query(
+      'execution_entries',
+      where: 'taskId = ? AND start >= ? AND start < ? AND isArchived = 0',
+      whereArgs: [widget.task.id, start.toLocal().toIso8601String(), end.toLocal().toIso8601String()],
+    );
 
     setState(() {
-      _entries = snapshot.docs.map((doc) => ExecutionEntry.fromMap(doc.data())).toList();
+      _entries = data.map((row) => ExecutionEntry.fromMap(row)).toList();
       _isLoading = false;
     });
   }
@@ -59,90 +59,82 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(current),
-      builder: (context, child) {
-        return MediaQuery(
+      builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
           child: child!,
-        );
-      },
+        ),
       initialEntryMode: TimePickerEntryMode.input,
     );
     if (picked != null) {
       final updated = DateTime(widget.selectedDate.year, widget.selectedDate.month, widget.selectedDate.day, picked.hour, picked.minute);
       setState(() {
-        if (isStart) {
-          _entries[index] = ExecutionEntry(
-            id: _entries[index].id,
-            taskId: _entries[index].taskId,
-            start: updated,
-            end: _entries[index].end,
-          );
-        } else {
-          _entries[index] = ExecutionEntry(
-            id: _entries[index].id,
-            taskId: _entries[index].taskId,
-            start: _entries[index].start,
-            end: updated,
-          );
-        }
+        _entries[index] = _entries[index].copyWith(
+          start: isStart ? updated : null,
+          end: isStart ? null : updated,
+        );
       });
     }
   }
   
   bool _validate() {
-    final now = DateTime.now().toLocal();
-    for (final entry in _entries) {
-      if (entry.start.isAfter(entry.end)) return false;
-      if (entry.end.isAfter(now)) return false;
+    final now = DateTime.now();
+
+    for (int i = 0; i < _entries.length; i++) {
+      final a = _entries[i];
+
+      if (a.start.isAfter(a.end)) return false;
+      if (a.end.isAfter(now)) return false;
+
+      for (int j = i + 1; j < _entries.length; j++) {
+        final b = _entries[j];
+
+        final overlap = a.start.isBefore(b.end) && a.end.isAfter(b.start);
+        if (overlap) return false;
+      }
     }
     return true;
   }
 
   Future<void> _save() async {
     if (!_validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ungültige Zeiten.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(
+        'Ungültige Eingabe. Ausführungen können nicht in der Zukunft sein und dürfen sich nicht überschneiden'
+      )));
       return;
     }
 
-    final user = getCurrentUserOrThrow();
-    final executionCollection = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection(widget.task.parentCollection)
-        .doc(widget.task.id)
-        .collection('executions');
-
+    final db = await getDatabase();
     final startOfDay = DateTime(widget.selectedDate.year, widget.selectedDate.month, widget.selectedDate.day);
     final endOfDay = startOfDay.add(const Duration(days: 1)).subtract(const Duration(milliseconds: 1));
 
-    final snapshot = await executionCollection
-        .where('start', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
-        .where('start', isLessThanOrEqualTo: Timestamp.fromDate(endOfDay))
-        .get();
+    final existing = await db.query(
+      'execution_entries',
+      where: 'taskId = ? AND start >= ? AND start < ?',
+      whereArgs: [widget.task.id, startOfDay.toLocal().toIso8601String(), endOfDay.toLocal().toIso8601String()],
+    );
 
-    final existingIds = snapshot.docs.map((doc) => doc.id).toSet();
-    final currentIds = _entries.map((e) => e.id).toSet();
+    final existingIds = existing.map((item) => item['id'] as String).toSet();
+    final currentIds = _entries.map((item) => item.id).toSet();
 
     final idsToDelete = existingIds.difference(currentIds);
 
-    final batch = FirebaseFirestore.instance.batch();
-
-    // 1. Löschen
-    for (final doc in snapshot.docs) {
-      if (idsToDelete.contains(doc.id)) {
-        batch.delete(doc.reference);
-      }
+    final batch = db.batch();
+    for (final id in idsToDelete) {
+      batch.delete('execution_entries', where: 'id = ?', whereArgs: [id]);
     }
 
-    // 2. Hinzufügen oder Überschreiben
     for (final entry in _entries) {
-      batch.set(executionCollection.doc(entry.id), entry.toFirebaseMap());
+      batch.insert(
+        'execution_entries',
+        entry.toLocalMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
 
-    await batch.commit();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.invalidate(weeklySumProvider(widget.task));
-    }); 
+    await batch.commit(noResult: true);
+    
+    ref.invalidate(weeklySumProvider(widget.task)); // Provider invaldieren, damit Homescreen neue Daten lädt
+    ref.invalidate(totalLoggedTimeProvider(widget.task.id));
 
     if (!mounted) return;
     Navigator.of(context).pop();
@@ -156,6 +148,9 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
       taskId: widget.task.id,
       start: defaultStart,
       end: defaultEnd,
+      isDirty: true,
+      isArchived: false,
+      updatedAt: DateTime.now(),
     );
     setState(() {
       _entries.add(newEntry);

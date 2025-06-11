@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:sqflite/sqflite.dart';
+
 import 'package:uuid/uuid.dart';
 
+import 'package:aspira/data/database.dart';
 import 'package:aspira/models/task_timer.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/models/execution_entry.dart';
-import 'package:aspira/utils/get_current_user.dart';
 
 class TaskTimerNotifier extends StateNotifier<Map<String, TaskTimer>> {
   TaskTimerNotifier() : super({});
@@ -57,26 +60,27 @@ class TaskTimerNotifier extends StateNotifier<Map<String, TaskTimer>> {
       taskId: taskId,
       start: _currentExecutions[taskId]!,
       end: DateTime.now(),
+      isDirty: true,
+      isArchived: false,
+      updatedAt: DateTime.now(),
     );
 
     try {
-      final user = getCurrentUserOrThrow();
-      final ref = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection(task.parentCollection)
-          .doc(taskId)
-          .collection('executions');
+      final db = await getDatabase();
+      await db.insert(
+        'execution_entries',
+        execution.toLocalMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      _currentExecutions.remove(taskId); // Aufräumen, um keinen unnötigen Speicher zu belegen
 
-      await ref.doc(execution.id).set(execution.toFirebaseMap());
-      _currentExecutions.remove(taskId);
     } catch (error, stackTrace) {
-      debugPrint('Fehler beim Speichern der ExecutionEntry: $error');
+      debugPrint('🛑 Fehler beim lokalen Speichern der ExecutionEntry: $error');
       debugPrintStack(stackTrace: stackTrace);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Fehler beim Speichern der Tracking-Daten')),
+          const SnackBar(content: Text('Fehler beim lokalen Speichern der Tracking-Daten')),
         );
       }
     }

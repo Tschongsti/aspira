@@ -53,5 +53,6 @@ android/app/google-services.json
 # iOS build
 ios/Runner/GoogleService-Info.plist
 
-android/key.properties
+#StoreKey
+android/app/key.properties
 *.jks

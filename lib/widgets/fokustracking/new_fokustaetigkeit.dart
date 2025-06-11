@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/models/trackable_task.dart';
 
 class NewFokustaetigkeit extends StatefulWidget {
   const NewFokustaetigkeit({super.key, required this.onAddFokustaetigkeit});

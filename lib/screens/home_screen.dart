@@ -8,7 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:go_router/go_router.dart';
 
-import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
@@ -40,8 +40,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final contextCopy = context; // für mounted check
-      ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities(contextCopy);
+      ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities();
     });
     
     setupPushNotifications();
