@@ -26,7 +26,7 @@ class ButtonNavigation extends StatelessWidget{
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12), // 👈 weniger rund
+            borderRadius: BorderRadius.circular(50), // 👈 weniger rund
           ),
           elevation: 0, // 👈 kein Schatten, falls du das clean willst
           padding: const EdgeInsets.symmetric(vertical: 16.0), // 👈 mehr vertikaler Innenabstand
@@ -35,7 +35,7 @@ class ButtonNavigation extends StatelessWidget{
           children: [
             Padding(
               padding: const EdgeInsets.only( // 👈 Abstand links & rechts vom Icon
-                left: 16,
+                left: 24,
                 right: 0,
               ),
               child: Icon(

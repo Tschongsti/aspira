@@ -179,20 +179,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Tagesfokus", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text(
+                      "Tagesfokus",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    _placeholderCard("Noch kein Tagesfokus erfasst"),
                     const SizedBox(height: 12),
-                    _placeholderCard("Noch kein Fokus erfasst"),
-                    const SizedBox(height: 24),
-                    const Text("To-Do", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text(
+                      "To-Do",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    _placeholderCard("Noch keine To-Do's für heute erfasst"),
                     const SizedBox(height: 12),
-                    _placeholderCard("Keine To-Do's heute"),
-                    const SizedBox(height: 24),
-                    const Text("To-Relax", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text(
+                      "To-Relax",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    _placeholderCard("Noch keine Tätigkeiten zum Entspannen eingeplant"),
                     const SizedBox(height: 12),
-                    _placeholderCard("Noch keine Pause eingeplant"),
-                    const SizedBox(height: 24),
-                    const Text("Tracking", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    const SizedBox(height: 12),
+                    Text(
+                      "Tracking",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
                     TrackingSection(tasks: fokusForToday, selectedDate: selectedDate),
                     const SizedBox(height: 80), // Platz für BottomNavigationBar
                   ],

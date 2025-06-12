@@ -27,7 +27,7 @@ class TrackingSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     
     if (tasks.isEmpty) {
-      return _placeholderCard("Keine Fokustätigkeit gestartet");
+      return _placeholderCard("Noch keine Fokustätigkeit definiert");
     }
 
     return Column(

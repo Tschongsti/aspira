@@ -48,16 +48,7 @@ class _State extends ConsumerState<FokustrackingIntroScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final visited = ref.watch(visitedScreensProvider);
-
-    // Falls bereits besucht -> sofortige Weiterleitung
-    if (visited.contains('fokus')) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/ins-tun/fokus');
-      });
-      return const SizedBox.shrink(); // zeigt „nichts“, vermeidet Flackern
-    }
-      
+   
     final config = AppScreenConfig(
       title: 'Fokustätigkeit Intro',
       showBottomNav: false,

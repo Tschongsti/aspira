@@ -33,10 +33,10 @@ class HomescreenTask extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: kPaddingSmall),
-      padding: const EdgeInsets.all(kPaddingMedium),
+      padding: const EdgeInsets.all(kPaddingSmall),
       decoration: BoxDecoration(
         color: _backgroundColor(),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(50),
       ),
       child: Row(
         children: [
@@ -45,7 +45,7 @@ class HomescreenTask extends StatelessWidget {
             child: IconTheme(
               data: const IconThemeData(
                 color: kAspiraGold,
-                size: 20,
+                size: 24,
               ),
               child: icon,
             ),
@@ -63,7 +63,6 @@ class HomescreenTask extends StatelessWidget {
                     color: Colors.white
                   ),
                 ),
-                const SizedBox (height: 4),
                 Text(
                   '${_formatDuration(loggedTime)} / ${_formatDuration(goalTime)}',
                   style: const TextStyle(
@@ -77,6 +76,7 @@ class HomescreenTask extends StatelessWidget {
           if (showEdit)
             IconButton(
               icon: const Icon(Icons.edit),
+              color: kAspiraGold,
               onPressed: onEdit,
             ),
           if (onTapMainAction != null)
@@ -107,7 +107,8 @@ class HomescreenTask extends StatelessWidget {
       case TaskType.timer:
         return IconButton(
           icon: Icon(
-            isRunning ? Icons.pause : Icons.play_arrow,
+            isRunning ? Icons.pause_circle_outline : Icons.play_circle_outline,
+            size: 36,
             color: kAspiraGold
           ),
           onPressed: onTapMainAction,

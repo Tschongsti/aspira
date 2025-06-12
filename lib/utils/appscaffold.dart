@@ -54,8 +54,8 @@ class AppScaffold extends StatelessWidget {
           ? BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               backgroundColor: kAspiraPurple,
-              selectedItemColor: kAspiraBrown,
-              unselectedItemColor: kAspiraGold,
+              selectedItemColor: kAspiraGold,
+              unselectedItemColor: kAspiraTextLight,
               onTap: (index) => _onTap(index, context),
               currentIndex: selectedIndex, // highlights the selected page
               items: const [

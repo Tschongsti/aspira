@@ -88,10 +88,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/ins-tun/fokus',
-        redirect: (context, state) => 
-          ref.read(visitedScreensProvider).contains('fokus')
+        redirect: (context, state) { 
+          final visited = ref.read(visitedScreensProvider);
+          return visited.contains('fokus')
             ? null
-            : '/ins-tun/fokus/intro',
+            : '/ins-tun/fokus/intro';
+        },
         builder: (context, state) => const FokustrackingScreen(),
       ),
       GoRoute(
