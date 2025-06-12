@@ -1,3 +1,4 @@
+import 'package:aspira/theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -99,16 +100,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 children: [
                   // ⬅️ Zurück-Button
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left, size: 20),
-                    visualDensity: VisualDensity.compact, // reduziert Padding
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(), // entfernt Standard-Mindestgrösse
-                    onPressed: () {
-                      setState(() {
-                        selectedDate = selectedDate.subtract(const Duration(days: 7));
-                      });
-                    },
+                  SizedBox(
+                    width: 20,
+                    child: IconButton(
+                      icon: const Icon(Icons.chevron_left, size: 20),
+                      visualDensity: VisualDensity.compact, // reduziert Padding
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(), // entfernt Standard-Mindestgrösse
+                      onPressed: () {
+                        setState(() {
+                          selectedDate = selectedDate.subtract(const Duration(days: 7));
+                        });
+                      },
+                    ),
                   ),
                   // Datums-Auswahl
                   ...weekDates.map((date) {
@@ -118,10 +122,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         onTap: () => setState(() => selectedDate = date),
                         child: Container(
                           margin: const EdgeInsets.symmetric(horizontal: 4),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 4),
                           decoration: BoxDecoration(
-                            color: isSelected ? Colors.purple : Colors.grey[300],
+                            color: isSelected ? kAspiraPurple : Colors.grey,
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? Colors.transparent : Colors.grey,
+                            ),
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -145,18 +152,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     );
                   }),
                   // ➡️ Vorwärts-Button
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right, size: 20),
-                    visualDensity: VisualDensity.compact, // reduziert Padding
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(), // entfernt Standard-Mindestgrösse
-                    onPressed: () {
-                      setState(() {
-                        selectedDate = selectedDate
-                            .add(const Duration(days: 7))
-                            .subtract(Duration(days: selectedDate.weekday - 1)); // auf Montag setzen
-                      });
-                    },
+                  SizedBox(
+                    width: 20,
+                    child: IconButton(
+                      icon: const Icon(Icons.chevron_right, size: 20),
+                      visualDensity: VisualDensity.compact, // reduziert Padding
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(), // entfernt Standard-Mindestgrösse
+                      onPressed: () {
+                        setState(() {
+                          selectedDate = selectedDate
+                              .add(const Duration(days: 7))
+                              .subtract(Duration(days: selectedDate.weekday - 1)); // auf Montag setzen
+                        });
+                      },
+                    ),
                   ),
                 ],
               ),

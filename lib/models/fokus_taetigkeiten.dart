@@ -10,19 +10,13 @@ final formatter = DateFormat('dd.MM.yyyy');
 
 const uuid = Uuid();
 
-const categoryIcons = {
-  IconName.landscape: Icons.landscape,
-  IconName.diversity_3: Icons.diversity_3,
-  IconName.favorite: Icons.favorite,
-};
-
 class FokusTaetigkeit extends TrackableTask {
   final Duration weeklyGoal;
   
   FokusTaetigkeit({
     required super.title,
     required super.description,
-    required super.iconName,
+    required super.iconData,
     required this.weeklyGoal,
     String? id,
     DateTime? startDate,
@@ -70,7 +64,8 @@ class FokusTaetigkeit extends TrackableTask {
       'id': id,
       'title': title,
       'description': description,
-      'iconName': iconName.name,
+      'iconCodePoint': iconData.codePoint,
+      'iconFontFamily': iconData.fontFamily,
       'startDate': startDate.toLocal().toIso8601String(),
       'status': status.name,
       'loggedTime': loggedTime.inMinutes,
@@ -87,10 +82,12 @@ class FokusTaetigkeit extends TrackableTask {
       id: map['id'],
       title: map['title'],
       description: map['description'] ?? '',
-      iconName: IconName.values.firstWhere(
-        (error) => error.name == map['iconName'],
-        orElse: () => IconName.favorite, // Fallback
-      ),
+      iconData: map['iconCodePoint'] != null
+        ? IconData(
+            map['iconCodePoint'], 
+            fontFamily: map['iconFontFamily']
+          )
+        : Icons.favorite, // Fallback
       startDate: DateTime.parse(map['startDate']),
       status: Status.values.firstWhere(
         (error) => error.name == map['status'],
@@ -108,7 +105,7 @@ class FokusTaetigkeit extends TrackableTask {
     String? id,
     String? title,
     String? description,
-    IconName? iconName,
+    IconData? iconData,
     DateTime? startDate,
     Status? status,
     Duration? loggedTime,
@@ -121,7 +118,7 @@ class FokusTaetigkeit extends TrackableTask {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      iconName: iconName ?? this.iconName,
+      iconData: iconData ?? this.iconData,
       startDate: startDate ?? this.startDate,
       status: status ?? this.status,
       loggedTime: loggedTime ?? this.loggedTime,

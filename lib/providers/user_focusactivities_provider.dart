@@ -18,7 +18,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
       final fokusList = data
         .map((row) => FokusTaetigkeit.fromLocalMap(row))
-        .where((item) => item.status == Status.active && !item.isArchived)
+        .where((item) => 
+          !item.isArchived &&
+          item.status != Status.deleted)
         .toList();
       state = fokusList;
     } catch (error, stackTrace) {

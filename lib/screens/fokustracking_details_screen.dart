@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/icon_picker.dart';
 
 class FokustrackingDetailsScreen extends ConsumerStatefulWidget {
   const FokustrackingDetailsScreen({
@@ -27,7 +27,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
   late String _title;
   late String _description;
   late int _weeklyGoal;
-  late IconName _selectedIcon;
+  late IconData _selectedIcon;
   
   bool _isSubmitting = false;
 
@@ -39,7 +39,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
     _title = widget.initialData?.title ?? '';
     _description = widget.initialData?.description ?? '';
     _weeklyGoal = widget.initialData?.weeklyGoal.inMinutes ?? 30;
-    _selectedIcon = widget.initialData?.iconName ?? IconName.favorite;
+    _selectedIcon = widget.initialData?.iconData ?? Icons.favorite;
   }
 
   Future<void> _toggleStatus() async {
@@ -52,7 +52,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       id: widget.initialData!.id,
       title: widget.initialData!.title,
       description: widget.initialData!.description,
-      iconName: widget.initialData!.iconName,
+      iconData: widget.initialData!.iconData,
       weeklyGoal: widget.initialData!.weeklyGoal,
       startDate: widget.initialData!.startDate,
       loggedTime: widget.initialData!.loggedTime,
@@ -95,7 +95,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       id: widget.initialData?.id, // bleibt gleich bei Update
       title: _title,
       description: _description,
-      iconName: _selectedIcon,
+      iconData: _selectedIcon,
       weeklyGoal: Duration(minutes: _weeklyGoal),
       status: widget.initialData?.status ?? Status.active,
       updatedAt: DateTime.now(),
@@ -186,23 +186,19 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(
-                      child: DropdownButtonFormField<IconName>(
-                        value: _selectedIcon,
-                        decoration: const InputDecoration(labelText: 'Icon'),
-                        items: IconName.values.map((icon) {
-                          return DropdownMenuItem(
-                            value: icon,
-                            child: Icon(categoryIcons[icon]),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          if (value == null) return;
-                            setState(() {
-                              _selectedIcon = value;
-                            });
-                        },
-                      ),
+                    Text('Icon'),
+                    const SizedBox(width: 16),
+                    IconButton(
+                      icon: Icon(_selectedIcon, size: 32),
+                      tooltip: 'Icon auswählen',
+                      onPressed: () async {
+                        final picked = await pickIcon(context);
+                        if (picked != null) {
+                          setState(() {
+                            _selectedIcon = picked;
+                          });
+                        }
+                      },
                     ),
                     const SizedBox(width: 16),
                     Expanded(

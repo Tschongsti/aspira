@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:aspira/theme/color_schemes.dart';
+import 'package:aspira/theme/spacing.dart';
+
 enum TaskType { task, quantity, timer }
 
 class HomescreenTask extends StatelessWidget {
@@ -29,27 +32,44 @@ class HomescreenTask extends StatelessWidget {
     final showEdit = loggedTime > Duration.zero && onEdit != null;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: kPaddingSmall),
+      padding: const EdgeInsets.all(kPaddingMedium),
       decoration: BoxDecoration(
         color: _backgroundColor(),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Colors.white.withAlpha(30),
-            child: icon,
+            backgroundColor: kAspiraLavender,
+            child: IconTheme(
+              data: const IconThemeData(
+                color: kAspiraGold,
+                size: 20,
+              ),
+              child: icon,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.white
+                  ),
+                ),
+                const SizedBox (height: 4),
                 Text(
                   '${_formatDuration(loggedTime)} / ${_formatDuration(goalTime)}',
-                  style: const TextStyle(fontSize: 12),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
@@ -70,17 +90,26 @@ class HomescreenTask extends StatelessWidget {
     switch (type) {
       case TaskType.task:
         return IconButton(
-          icon: const Icon(Icons.check),
+          icon: const Icon(
+            Icons.check,
+            color: kAspiraGold
+          ),
           onPressed: onTapMainAction,
         );
       case TaskType.quantity:
         return IconButton(
-          icon: const Icon(Icons.add),
+          icon: const Icon(
+            Icons.add,
+            color: kAspiraGold
+          ),
           onPressed: onTapMainAction,
         );
       case TaskType.timer:
         return IconButton(
-          icon: Icon(isRunning ? Icons.pause : Icons.play_arrow),
+          icon: Icon(
+            isRunning ? Icons.pause : Icons.play_arrow,
+            color: kAspiraGold
+          ),
           onPressed: onTapMainAction,
         );
     }
@@ -93,7 +122,7 @@ class HomescreenTask extends StatelessWidget {
       case TaskType.quantity:
         return Colors.orange.shade100;
       case TaskType.timer:
-        return Colors.purple.shade100;
+        return kAspiraPurple;
     }
   }
 

@@ -7,3 +7,4 @@ final kTextTheme = TextTheme(
   bodyMedium: GoogleFonts.inter(fontSize: 14),
   labelLarge: GoogleFonts.inter(fontSize: 13, letterSpacing: 0.4),
 );
+

@@ -38,7 +38,7 @@ final FokusTaetigkeit fokusTaetigkeiten;
         child: Row (
           children: [
             Icon (
-              categoryIcons[fokusTaetigkeiten.iconName],
+              fokusTaetigkeiten.iconData,
               size: 40,
             ),
             SizedBox(width: 16),

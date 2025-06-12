@@ -55,7 +55,7 @@ class TrackingSection extends ConsumerWidget {
         
         return HomescreenTask(
           type: TaskType.timer,
-          icon: Icon(Icons.access_time),
+          icon: Icon(task.iconData),
           title: task.title,
           loggedTime: loggedTime,
           goalTime: task.weeklyGoal,

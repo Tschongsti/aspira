@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
-import 'package:aspira/models/trackable_task.dart';
+import 'package:aspira/utils/icon_picker.dart';
 
 class NewFokustaetigkeit extends StatefulWidget {
   const NewFokustaetigkeit({super.key, required this.onAddFokustaetigkeit});
@@ -18,7 +18,7 @@ class _NewFokustaetigkeitState extends State<NewFokustaetigkeit> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _weeklyGoalController = TextEditingController();
-  IconName _selectedIconName = IconName.favorite;
+  IconData _selectedIcon = Icons.favorite;
 
 void _showDialog () {
       showDialog(
@@ -53,7 +53,7 @@ void _submitTaetigkeitData () {
       FokusTaetigkeit(    
         title: _titleController.text,
         description: _descriptionController.text,
-        iconName: _selectedIconName,
+        iconData: _selectedIcon,
         weeklyGoal: Duration(minutes: enteredWeeklyGoal.round()),
       ),
     );
@@ -97,26 +97,17 @@ void _submitTaetigkeitData () {
                 ),
                  Row(
                   children: [
-                    DropdownButton (
-                      value: _selectedIconName,
-                      items: IconName.values
-                        .map(
-                          (category) => DropdownMenuItem(
-                            value: category,
-                            child: Icon(
-                              categoryIcons[category],
-                              ),
-                            ),
-                        )
-                        .toList(),
-                      onChanged: (value) {
-                        if (value == null) {
-                          return;
+                    IconButton(
+                      icon: Icon(_selectedIcon, size: 32),
+                      tooltip: 'Icon wählen',
+                      onPressed: () async {
+                        final pickedIcon = await pickIcon(context);
+                        if (pickedIcon != null) {
+                          setState(() {
+                            _selectedIcon = pickedIcon;
+                          });
                         }
-                        setState(() {
-                          _selectedIconName = value;
-                        });
-                      }
+                      },
                     ),
                     const SizedBox(width: 16),
                     Expanded(

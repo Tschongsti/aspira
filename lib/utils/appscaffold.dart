@@ -1,3 +1,4 @@
+import 'package:aspira/theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -51,6 +52,10 @@ class AppScaffold extends StatelessWidget {
       body: child,
       bottomNavigationBar: config.showBottomNav
           ? BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: kAspiraPurple,
+              selectedItemColor: kAspiraBrown,
+              unselectedItemColor: kAspiraGold,
               onTap: (index) => _onTap(index, context),
               currentIndex: selectedIndex, // highlights the selected page
               items: const [

@@ -5,10 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import 'package:aspira/utils/styling_theme.dart';
+import 'package:aspira/theme/themes.dart';
 import 'package:aspira/router/app_router.dart';
 
 
@@ -52,20 +51,9 @@ class AspiraApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router =ref.watch(appRouterProvider);
     return MaterialApp.router(
-      theme: ThemeData().copyWith(
-        colorScheme: kColorScheme,
-        textTheme: GoogleFonts.interTextTheme(),
-        scaffoldBackgroundColor: kColorScheme.surface,
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: kColorScheme.primary,
-          selectedItemColor: kColorScheme.onPrimary,
-          unselectedItemColor: kColorScheme.onPrimary.withAlpha(120),
-          type: BottomNavigationBarType.fixed
-        ),
-        ),
-      darkTheme: ThemeData.dark().copyWith(
-        colorScheme: kDarkColorScheme,
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }

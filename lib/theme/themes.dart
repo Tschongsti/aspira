@@ -24,8 +24,17 @@ final ThemeData lightTheme = ThemeData.from(
 ).copyWith(
   scaffoldBackgroundColor: kAspiraBackground,
   appBarTheme: AppBarTheme(
-    backgroundColor: kAspiraPurple,
-    foregroundColor: Colors.white,
+    backgroundColor: kAspiraBackground,
+    elevation: 0,
+    centerTitle: true,
+    titleTextStyle: GoogleFonts.inter(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      color: kAspiraPurple
+    ),
+    iconTheme: const IconThemeData(
+      color: kAspiraBrown
+    ), 
   ),
   // ... weitere spezifische Themes
 );

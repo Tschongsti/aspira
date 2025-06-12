@@ -1,12 +1,13 @@
+import 'package:flutter/material.dart';
+
 enum Status { active, inactive, deleted }
-enum IconName { landscape, diversity_3, favorite}
 enum Type { task, quantity, time }
 
 abstract class TrackableTask {
   final String id;
   final String title;
   final String description;
-  final IconName iconName;
+  final IconData iconData;
   final DateTime startDate;
   final Status status;
   final Duration loggedTime;
@@ -21,7 +22,7 @@ abstract class TrackableTask {
     required this.id,
     required this.title,
     required this.description,
-    required this.iconName,
+    required this.iconData,
     required this.startDate,
     required this.status,
     required this.loggedTime,
