@@ -7,7 +7,7 @@ Future<IconData?> pickIcon(BuildContext context) async {
   final IconPickerIcon? picked = await showIconPicker(
     context,
     configuration: const SinglePickerConfiguration(
-      iconPackModes: [IconPack.material],
+      iconPackModes: [IconPack.lineAwesomeIcons],
       adaptiveDialog: true,
       iconColor: Colors.amber, // z. B. kAspiraGold
       backgroundColor: Colors.white,

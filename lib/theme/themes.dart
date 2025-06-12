@@ -20,18 +20,14 @@ final kDarkColorScheme = ColorScheme.fromSeed(
 
 final ThemeData lightTheme = ThemeData.from(
   colorScheme: kLightColorScheme,
-  textTheme: GoogleFonts.interTextTheme(),
+  textTheme: kTextTheme,
 ).copyWith(
   scaffoldBackgroundColor: kAspiraBackground,
   appBarTheme: AppBarTheme(
     backgroundColor: kAspiraBackground,
     elevation: 0,
     centerTitle: true,
-    titleTextStyle: GoogleFonts.inter(
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
-      color: kAspiraPurple
-    ),
+    titleTextStyle: kTextTheme.titleLarge,
     iconTheme: const IconThemeData(
       color: kAspiraBrown
     ), 
