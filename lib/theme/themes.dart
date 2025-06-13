@@ -32,6 +32,28 @@ final ThemeData lightTheme = ThemeData.from(
       color: kAspiraBrown
     ), 
   ),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: kAspiraPurple,
+      foregroundColor: kAspiraTextLight,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+    ),
+  ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      side: const BorderSide(
+        color: kAspiraLavender,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(50),
+      ),
+    ),
+  ),
+  cardTheme: CardTheme(
+      color: kAspiraTextLight,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+    ),
   // ... weitere spezifische Themes
 );
 

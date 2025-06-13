@@ -1,12 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:duration/duration.dart';
-
-import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 import 'package:aspira/models/trackable_task.dart';
 
@@ -68,15 +64,8 @@ class FokusTaetigkeit extends TrackableTask {
       'id': id,
       'title': title,
       'description': description,
-      'iconJson': jsonEncode(
-        serializeIcon(
-          IconPickerIcon(
-            name: iconData.codePoint.toString(),
-            data: iconData,
-            pack: IconPack.lineAwesomeIcons,
-          ),
-        ),
-      ),
+      'iconCodePoint': iconData.codePoint,
+      'iconFontFamily': iconData.fontFamily,
       'startDate': startDate.toLocal().toIso8601String(),
       'status': status.name,
       'loggedTime': loggedTime.inMinutes,
@@ -93,8 +82,11 @@ class FokusTaetigkeit extends TrackableTask {
       id: map['id'],
       title: map['title'],
       description: map['description'] ?? '',
-      iconData: map['iconJson'] != null
-        ? deserializeIcon(jsonDecode(map['iconJson']))!.data
+      iconData: map['iconCodePoint'] != null
+        ? IconData(
+            map['iconCodePoint'],
+            fontFamily: map['iconFontFamily']
+          )
         : Icons.favorite, // Fallback
       startDate: DateTime.parse(map['startDate']),
       status: Status.values.firstWhere(

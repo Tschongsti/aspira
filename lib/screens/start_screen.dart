@@ -150,18 +150,10 @@ class _StartScreenState extends State<StartScreen> {
                           if (!_isAuthenticating)
                           ElevatedButton(
                             onPressed: _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .primaryContainer,
-                            ),
                             child: Text (
                               _isLogin
                                 ? 'Login'
                                 : 'Signup',
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
                             ),
                           ),
                           if (!_isAuthenticating)
@@ -173,7 +165,7 @@ class _StartScreenState extends State<StartScreen> {
                             },
                             child: Text(_isLogin
                               ? 'Create an account'
-                              : 'I already have an account.'),
+                              : 'I already have an account'),
                           ),
                         ],
                       ),

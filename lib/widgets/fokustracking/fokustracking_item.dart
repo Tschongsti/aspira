@@ -30,6 +30,10 @@ final FokusTaetigkeit fokusTaetigkeiten;
     );
 
     return Card(
+      margin: EdgeInsets.symmetric(
+        vertical: 12,
+        horizontal: 16,
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 20,
