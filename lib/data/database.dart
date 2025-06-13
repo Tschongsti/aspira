@@ -13,6 +13,7 @@ Future<Database> getDatabase() async {
       await db.execute('''
         CREATE TABLE IF NOT EXISTS user_focusactivities(
           id TEXT PRIMARY KEY,
+          userId TEXT,
           title TEXT,
           description TEXT,
           iconJson TEXT,

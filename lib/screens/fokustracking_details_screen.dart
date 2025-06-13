@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
+import 'package:aspira/providers/current_user_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/icon_picker.dart';
@@ -50,6 +51,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
 
     final toggled = FokusTaetigkeit(
       id: widget.initialData!.id,
+      userId: widget.initialData!.userId,
       title: widget.initialData!.title,
       description: widget.initialData!.description,
       iconData: widget.initialData!.iconData,
@@ -85,6 +87,14 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
   }
 
   Future<void> _saveForm() async {
+    final userId = ref.read(currentUserIdProvider);
+      if (userId == 'unknown') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kein gültiger Nutzer.')),
+        );
+        return;
+      }
+    
     final isValid = _formKey.currentState!.validate();
     if (!isValid) return;
 
@@ -93,6 +103,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
 
     final updated = FokusTaetigkeit(
       id: widget.initialData?.id, // bleibt gleich bei Update
+      userId: userId,
       title: _title,
       description: _description,
       iconData: _selectedIcon,
@@ -126,19 +137,6 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
-
-  //void _pickIcon() async {
-  //  IconData? icon = await IconPicker.showPicker(
-  //    context,
-  //    iconPackModes: [IconPack.material],
-  //  );
-
-  //  if (icon != null) {
-  //    setState(() {
-  //      _selectedIcon = icon;
-  //    });
-  //  }
-  //}
 
   @override
   Widget build(BuildContext context) {

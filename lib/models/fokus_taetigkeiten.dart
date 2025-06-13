@@ -18,6 +18,7 @@ class FokusTaetigkeit extends TrackableTask {
   final Duration weeklyGoal;
   
   FokusTaetigkeit({
+    required super.userId,
     required super.title,
     required super.description,
     required super.iconData,
@@ -66,6 +67,7 @@ class FokusTaetigkeit extends TrackableTask {
   Map<String, dynamic> toLocalMap() {
     return {
       'id': id,
+      'userId': userId,
       'title': title,
       'description': description,
       'iconJson': jsonEncode(
@@ -89,13 +91,20 @@ class FokusTaetigkeit extends TrackableTask {
   }
 
   factory FokusTaetigkeit.fromLocalMap(Map<String, dynamic> map) {
-    return FokusTaetigkeit(
+    final iconJsonRaw = map['iconJson'];
+    final iconMap = iconJsonRaw != null ? jsonDecode(iconJsonRaw) : null;
+    final deserializedIcon = iconMap != null ? deserializeIcon(iconMap) : null;
+
+    if (deserializedIcon == null) {
+      debugPrint('⚠️ Icon konnte nicht deserialisiert werden: $iconJsonRaw');
+    }
+    
+    return FokusTaetigkeit(   
       id: map['id'],
+      userId: map['userId'],
       title: map['title'],
       description: map['description'] ?? '',
-      iconData: map['iconJson'] != null
-        ? deserializeIcon(jsonDecode(map['iconJson']))!.data
-        : Icons.favorite, // Fallback
+      iconData: deserializedIcon?.data ?? Icons.hourglass_empty,
       startDate: DateTime.parse(map['startDate']),
       status: Status.values.firstWhere(
         (error) => error.name == map['status'],
@@ -111,6 +120,7 @@ class FokusTaetigkeit extends TrackableTask {
 
   FokusTaetigkeit copyWith({
     String? id,
+    String? userId,
     String? title,
     String? description,
     IconData? iconData,
@@ -124,6 +134,7 @@ class FokusTaetigkeit extends TrackableTask {
   }) {
     return FokusTaetigkeit(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       title: title ?? this.title,
       description: description ?? this.description,
       iconData: iconData ?? this.iconData,

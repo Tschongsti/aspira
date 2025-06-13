@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/utils/icon_picker.dart';
 
-class NewFokustaetigkeit extends StatefulWidget {
+import 'package:aspira/providers/current_user_provider.dart';
+
+class NewFokustaetigkeit extends ConsumerStatefulWidget {
   const NewFokustaetigkeit({super.key, required this.onAddFokustaetigkeit});
 
   final void Function(FokusTaetigkeit fokusTaetigkeit) onAddFokustaetigkeit;
 
   @override
-  State<NewFokustaetigkeit> createState () {
+  ConsumerState<NewFokustaetigkeit> createState () {
     return _NewFokustaetigkeitState();
   }
 }
 
-class _NewFokustaetigkeitState extends State<NewFokustaetigkeit> {
+class _NewFokustaetigkeitState extends ConsumerState<NewFokustaetigkeit> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _weeklyGoalController = TextEditingController();
@@ -39,6 +43,14 @@ void _showDialog () {
   }
 
 void _submitTaetigkeitData () {
+    final userId = ref.read(currentUserIdProvider);
+      if (userId == 'unknown') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kein gültiger Nutzer.')),
+        );
+        return;
+      }
+    
     final enteredWeeklyGoal = double.tryParse(_weeklyGoalController.text); // tryParse('Hello') => null, tryParse('1.13') => 1.13
     final weeklyGoalIsInvalid = enteredWeeklyGoal == null || enteredWeeklyGoal <=0; // && = AND, || = OR
       if(
@@ -51,6 +63,7 @@ void _submitTaetigkeitData () {
     
     widget.onAddFokustaetigkeit(  
       FokusTaetigkeit(    
+        userId: userId,
         title: _titleController.text,
         description: _descriptionController.text,
         iconData: _selectedIcon,

@@ -5,6 +5,7 @@ enum Type { task, quantity, time }
 
 abstract class TrackableTask {
   final String id;
+  final String userId;
   final String title;
   final String description;
   final IconData iconData;
@@ -20,6 +21,7 @@ abstract class TrackableTask {
 
   const TrackableTask({
     required this.id,
+    required this.userId,
     required this.title,
     required this.description,
     required this.iconData,

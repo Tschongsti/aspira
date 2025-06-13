@@ -6,26 +6,45 @@ import 'package:sqflite/sqflite.dart';
 
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/providers/current_user_provider.dart';
 import 'package:aspira/data/database.dart';
 
 class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
-  UserFokusActivitiesNotifier() : super(const []);
+  final String userId;
+
+  UserFokusActivitiesNotifier({required this.userId}) : super(const []);
 
   Future<void> loadFokusActivities() async {
     try {
       final db = await getDatabase();
-      final data = await db.query('user_focusactivities');
+      
+      if (userId == 'unknown') {
+        debugPrint('⚠️ Kein gültiger Nutzer – keine Fokustätigkeiten geladen.');
+        state = [];
+        return;
+      }
+
+      final data = await db.query(
+        'user_focusactivities',
+        where: '''
+          userId = ?
+          AND (isArchived IS NULL OR isArchived = 0)
+          AND status != ?
+        ''',
+        whereArgs: [userId, Status.deleted.name],
+      );
 
       final fokusList = data
-        .map((row) => FokusTaetigkeit.fromLocalMap(row))
-        .where((item) => 
-          !item.isArchived &&
-          item.status != Status.deleted)
+        .map((row) {
+          debugPrint('🧱 Zeile aus DB: $row');
+          return FokusTaetigkeit.fromLocalMap(row);
+        })
         .toList();
       state = fokusList;
     } catch (error, stackTrace) {
       debugPrint('🛑 Fehler beim Laden der Fokustätigkeiten: $error');
       debugPrintStack(stackTrace: stackTrace);
+      state = [];
     }
   }
 
@@ -33,12 +52,13 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     final previousState = [...state];
     try {
       final db = await getDatabase();
+      final fokusWithUser = fokus.copyWith(userId: userId);
       await db.insert(
         'user_focusactivities',
-        fokus.toLocalMap(),
+        fokusWithUser.toLocalMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      state = [fokus, ...state];
+      state = [fokusWithUser, ...state];
     } catch (error, stackTrace) {
       debugPrint('🛑 Fehler beim Hinzufügen: $error');
       debugPrintStack(stackTrace: stackTrace);
@@ -56,6 +76,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         final timestamp = DateTime.now().toIso8601String();
         final archived = updated.copyWith(
           id: '${updated.id}_$timestamp',
+          userId: userId,
           isArchived: true,
           updatedAt: DateTime.now(),
           isDirty: true,
@@ -66,6 +87,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
       }
 
       final updatedWithMeta = updated.copyWith(
+        userId: userId,
         updatedAt: DateTime.now(),
         isDirty: true,
       );
@@ -97,8 +119,8 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
       final db = await getDatabase();
       await db.delete(
         'user_focusactivities',
-        where: 'id = ?',
-        whereArgs: [id],
+        where: 'id = ? AND userId = ?',
+        whereArgs: [id, userId],
       );
       state = [...state]..removeWhere((item) => item.id == id);
     } catch (error, stackTrace) {
@@ -112,14 +134,15 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     final previousState = [...state];
     try {
       final db = await getDatabase();
+      final fokusWithUser = fokus.copyWith(userId: userId);
       await db.insert(
         'user_focusactivities',
-        fokus.toLocalMap(),
+        fokusWithUser.toLocalMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
       final newList = [...state];
-      newList.insert(index, fokus);
+      newList.insert(index, fokusWithUser);
       state = newList;
     } catch (error, stackTrace) {
       debugPrint('🛑 Fehler beim Einfügen an Position: $error');
@@ -131,7 +154,11 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
   Future<void> clearAll() async {
     try {
       final db = await getDatabase();
-      await db.delete('user_focusactivities');
+      await db.delete(
+        'user_focusactivities',
+        where: 'userId = ?',
+        whereArgs: [userId],
+      );
       state = [];
     } catch (error, stackTrace) {
       debugPrint('🛑 Fehler beim Leeren: $error');
@@ -146,5 +173,8 @@ final showInactiveProvider = StateProvider<bool>((ref) => false);
 // Hauptprovider
 final userFokusActivitiesProvider =
     StateNotifierProvider<UserFokusActivitiesNotifier, List<FokusTaetigkeit>>(
-  (ref) => UserFokusActivitiesNotifier(),
+  (ref) {
+    final userId = ref.watch(currentUserIdProvider);
+    return UserFokusActivitiesNotifier(userId: userId);
+  },
 );
