@@ -18,6 +18,7 @@ class FokustrackingList extends StatelessWidget{
  @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      padding: const EdgeInsets.only(top: 16),
       itemCount: fokusTaetigkeiten.length,
       itemBuilder: (ctx, index) => Dismissible(
         key: ValueKey(fokusTaetigkeiten[index]),

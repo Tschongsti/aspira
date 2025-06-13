@@ -190,23 +190,34 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
                     itemCount: _entries.length,
                     itemBuilder: (context, index) {
                       final entry = _entries[index];
-                      return ListTile(
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextButton(
-                              onPressed: () => _pickTime(index, true),
-                              child: Text('Start: ${_formatTime(entry.start)}'),
-                            ),
-                            TextButton(
-                              onPressed: () => _pickTime(index, false),
-                              child: Text('Ende: ${_formatTime(entry.end)}'),
-                            ),
-                          ],
+                      return Card(
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 6,
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _removeEntry(index),
+                        child: Padding (
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox (width: 24),
+                                TextButton(
+                                  onPressed: () => _pickTime(index, true),
+                                  child: Text('Start: ${_formatTime(entry.start)}'),
+                                ),
+                                SizedBox (width: 12),
+                                TextButton(
+                                  onPressed: () => _pickTime(index, false),
+                                  child: Text('Ende: ${_formatTime(entry.end)}'),
+                                ),
+                                Spacer(),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.black),
+                                  onPressed: () => _removeEntry(index),
+                                ),
+                                SizedBox (width: 24),
+                              ],
+                            ),
                         ),
                       );
                     },

@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import 'package:aspira/providers/visited_screens_provider.dart';
-import 'package:aspira/theme/themes.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 
@@ -82,7 +81,7 @@ class _State extends ConsumerState<FokustrackingIntroScreen> {
 
             // Erklärungstext
             Text(
-              'Hast du dich schon gefragt, wie viel deiner Zeit wirklich in das fließt, was dir am allerwichtigsten ist?\n\nNur was sichtbar wird, kann bewusst wachsen.',
+              'Hast du dich schon gefragt, wie viel deiner Zeit wirklich in das fliesst, was dir am allerwichtigsten ist?\n\nNur was sichtbar wird, kann bewusst wachsen.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -110,7 +109,7 @@ class _State extends ConsumerState<FokustrackingIntroScreen> {
               },
               style: ElevatedButton.styleFrom(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 72),
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               ),
               child: const Text('Erfasse deine Fokus‑Tätigkeiten'),
             ),

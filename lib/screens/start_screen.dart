@@ -48,7 +48,7 @@ class _StartScreenState extends State<StartScreen> {
 
       } 
     } on FirebaseAuthException catch (error) {
-        String message = 'Authentication failed.';
+        String message = 'Authentifizierung fehlgeschlagen';
 
         if (error.code == 'user-not-found') {
           message = 'Kein Benutzer für diese E-Mail gefunden';
