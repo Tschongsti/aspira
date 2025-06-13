@@ -36,8 +36,8 @@ final FokusTaetigkeit fokusTaetigkeiten;
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
+          horizontal: 16,
+          vertical: 8,
           ),
         child: Row (
           children: [
@@ -46,24 +46,43 @@ final FokusTaetigkeit fokusTaetigkeiten;
               size: 40,
             ),
             SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  fokusTaetigkeiten.title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fokusTaetigkeiten.title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox (height: 4),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Startdatum:'),
+                          Text(fokusTaetigkeiten.formattedDate),
+                        ],
+                      ),
+                    ),
+                    const SizedBox (height: 0),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Fokuszeit:'),
+                          Text(loggedTimeDisplay),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox (height: 6),
-                Text (
-                  fokusTaetigkeiten.formattedDate,
-                ),
-                const SizedBox (height: 4),
-                Text (
-                  loggedTimeDisplay,
-                ),
-              ],
+              ),
             ),
           ],
         ),

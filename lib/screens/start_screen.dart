@@ -51,15 +51,15 @@ class _StartScreenState extends State<StartScreen> {
         String message = 'Authentication failed.';
 
         if (error.code == 'user-not-found') {
-          message = 'No user found for that email.';
+          message = 'Kein Benutzer für diese E-Mail gefunden';
         } else if (error.code == 'wrong-password') {
-          message = 'Wrong password provided.';
+          message = 'Ungültiges Passwort';
         } else if (error.code == 'email-already-in-use') {
-          message = 'This email is already in use.';
+          message = 'Diese E-Mail wird bereits verwendet';
         } else if (error.code == 'invalid-email') {
-          message = 'The email address is invalid.';
+          message = 'Ungültige E-Mail';
         } else if (error.code == 'weak-password') {
-          message = 'The password is too weak.';
+          message = 'Zu schwaches Passwort';
         }
 
         if (!mounted) return;
@@ -107,7 +107,7 @@ class _StartScreenState extends State<StartScreen> {
                         children: [
                           TextFormField(
                             decoration: const InputDecoration(
-                              labelText: 'Email Address'
+                              labelText: 'E-Mail'
                             ),
                             keyboardType: TextInputType.emailAddress,
                             maxLength: 60,
@@ -117,7 +117,7 @@ class _StartScreenState extends State<StartScreen> {
                               if (value == null ||
                                   value.trim().isEmpty ||
                                   !value.contains('@')) {
-                                return 'Please enter a valid email adress.';
+                                return 'Bitte eine gültige E-Mail Adresse eingeben';
                               }
 
                               return null;
@@ -128,14 +128,14 @@ class _StartScreenState extends State<StartScreen> {
                           ),
                           TextFormField(
                             decoration: const InputDecoration(
-                              labelText: 'Password'
+                              labelText: 'Passwort'
                             ),
                             maxLength: 60,
                             obscureText: true,
                             validator: (value) {
                               if (value == null ||
                                  value.trim().length < 6) {
-                                return 'Password must be at least 6 characters long.';
+                                return 'Passwort muss mindestes 6 Zeichen lang sein';
                               }
 
                               return null;
@@ -148,24 +148,30 @@ class _StartScreenState extends State<StartScreen> {
                           if (_isAuthenticating)
                             const CircularProgressIndicator(),
                           if (!_isAuthenticating)
-                          ElevatedButton(
-                            onPressed: _submit,
-                            child: Text (
-                              _isLogin
-                                ? 'Login'
-                                : 'Signup',
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _submit,
+                              child: Text (
+                                _isLogin
+                                  ? 'Einloggen'
+                                  : 'Anmelden',
+                              ),
                             ),
                           ),
                           if (!_isAuthenticating)
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _isLogin = !_isLogin;
-                              });
-                            },
-                            child: Text(_isLogin
-                              ? 'Create an account'
-                              : 'I already have an account'),
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isLogin = !_isLogin;
+                                });
+                              },
+                              child: Text(_isLogin
+                                ? 'Erstelle ein Benutzerkonto'
+                                : 'Ich habe schon ein Benutzerkonto'),
+                            ),
                           ),
                         ],
                       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aspira/providers/notifications_filter_provider.dart';
+import 'package:aspira/theme/color_schemes.dart';
 
 class SwitchlisttileNotifikationen extends ConsumerWidget{
   
@@ -28,7 +29,7 @@ class SwitchlisttileNotifikationen extends ConsumerWidget{
       },
       title: Text(
         title,
-        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+        style: Theme.of(context).textTheme.titleMedium!.copyWith(
           color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
@@ -38,7 +39,7 @@ class SwitchlisttileNotifikationen extends ConsumerWidget{
           color: Theme.of(context).colorScheme.onSurface,
           ),
       ),
-      activeColor: Theme.of(context).colorScheme.tertiary,
+      activeColor: kAspiraPurple,
       contentPadding: const EdgeInsets.only(
         left: 34,
         right: 22,

@@ -94,21 +94,20 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
           if (hasInactive)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      ref.read(showInactiveProvider.notifier).state = !showInactive;
-                    },                          
-                    icon: Icon(showInactive ? Icons.visibility : Icons.visibility_off),
-                    label: Text(showInactive
-                        ? 'Aktive Fokustätigkeiten anzeigen'
-                        : 'Inaktive Fokustätigkeiten anzeigen'),
-                  ),
-                ],
+              child: SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () {
+                    ref.read(showInactiveProvider.notifier).state = !showInactive;
+                  },                          
+                  icon: Icon(showInactive ? Icons.visibility : Icons.visibility_off),
+                  label: Text(showInactive
+                      ? 'Aktive Fokustätigkeiten anzeigen'
+                      : 'Inaktive Fokustätigkeiten anzeigen'),
+                ),
               ),
             ),
+          SizedBox(height: 6),
         ],
       ),
     );

@@ -143,124 +143,130 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
 
     return AppScaffold(
       config: config,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Titel'),
-                  initialValue: _title,
-                  maxLength: 40,
-                  validator: (value) {
-                    if (value == null || value.trim().length < 3) {
-                      return 'Mind. 3 Zeichen nötig.';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) => _title = value!.trim(),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Beschreibung'),
-                  initialValue: _description,
-                  maxLength: 250,
-                  minLines: 1,
-                  maxLines: 6,
-                  keyboardType: TextInputType.multiline,
-                  onSaved: (value) => _description = value?.trim() ?? '',
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Text('Icon'),
-                    const SizedBox(width: 16),
-                    IconButton(
-                      icon: Icon(_selectedIcon, size: 32),
-                      tooltip: 'Icon auswählen',
-                      onPressed: () async {
-                        final picked = await pickIcon(context);
-                        if (picked != null) {
-                          setState(() {
-                            _selectedIcon = picked;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Wochenziel',
-                          suffixText: 'Min',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+         return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Form(
+                    key: _formKey, // für was?
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextFormField(
+                          decoration: const InputDecoration(labelText: 'Titel'),
+                          initialValue: _title,
+                          maxLength: 40,
+                          validator: (value) {
+                            if (value == null || value.trim().length < 3) {
+                              return 'Mind. 3 Zeichen nötig.';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) => _title = value!.trim(),
                         ),
-                        keyboardType: TextInputType.number,
-                        initialValue: _weeklyGoal.toString(),
-                        validator: (value) {
-                          final parsed = int.tryParse(value ?? '');
-                          if (parsed == null || parsed <= 0) {
-                            return 'Bitte gültige Zahl > 0';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _weeklyGoal = int.parse(value!);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: _isSubmitting
-                        ? null 
-                        : () => Navigator.of(context).pop(),
-                      child: const Text('Abbrechen'),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: _isSubmitting 
-                        ? null 
-                        : _saveForm,
-                      child: _isSubmitting
-                        ? const SizedBox(
-                            height: 16,
-                            width: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Speichern'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                if (isEditMode)
-                  ElevatedButton(
-                    onPressed: _isSubmitting
-                      ? null
-                      : _toggleStatus,
-                    style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-                      backgroundColor: WidgetStateProperty.all(kAspiraBrown),
-                    ),
-                    child: _isSubmitting
-                      ? const SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          isInactive
-                            ? 'Fokustätigkeit reaktivieren'
-                            : 'Fokustätigkeit inaktivieren',
+                        TextFormField(
+                          decoration: const InputDecoration(labelText: 'Beschreibung'),
+                          initialValue: _description,
+                          maxLength: 250,
+                          minLines: 1,
+                          maxLines: 6,
+                          keyboardType: TextInputType.multiline,
+                          onSaved: (value) => _description = value?.trim() ?? '',
                         ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Text('Icon'),
+                            const SizedBox(width: 16),
+                            IconButton(
+                              icon: Icon(_selectedIcon, size: 32),
+                              tooltip: 'Icon auswählen',
+                              onPressed: () async {
+                                final picked = await pickIcon(context);
+                                if (picked != null) {
+                                  setState(() {
+                                    _selectedIcon = picked;
+                                  });
+                                }
+                              },
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: 'Wochenziel',
+                                  suffixText: 'Min',
+                                ),
+                                keyboardType: TextInputType.number,
+                                initialValue: _weeklyGoal.toString(),
+                                validator: (value) {
+                                  final parsed = int.tryParse(value ?? '');
+                                  if (parsed == null || parsed <= 0) {
+                                    return 'Bitte gültige Zahl > 0';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (value) {
+                                  _weeklyGoal = int.parse(value!);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 36),
+                        ElevatedButton(
+                          onPressed: _isSubmitting 
+                            ? null 
+                            : _saveForm,
+                          child: _isSubmitting
+                            ? const SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('Speichern'),
+                        ),
+                        const SizedBox (height: 12),
+                        TextButton(
+                          onPressed: _isSubmitting
+                            ? null 
+                            : () => Navigator.of(context).pop(),
+                          child: const Text('Abbrechen'),
+                        ),                        
+                        const Spacer(),
+                        if (isEditMode)
+                          ElevatedButton(
+                            onPressed: _isSubmitting
+                              ? null
+                              : _toggleStatus,
+                            style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                              backgroundColor: WidgetStateProperty.all(kAspiraBrown),
+                            ),
+                            child: _isSubmitting
+                              ? const SizedBox(
+                                  height: 16,
+                                  width: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Text(
+                                  isInactive
+                                    ? 'Fokustätigkeit reaktivieren'
+                                    : 'Fokustätigkeit inaktivieren',
+                                ),
+                            ),
+                          const SizedBox(height: 36),
+                      ],
                     ),
-              ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
