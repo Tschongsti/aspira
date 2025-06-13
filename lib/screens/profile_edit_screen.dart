@@ -149,9 +149,9 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
               child: TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Benutzername',
-                  border: OutlineInputBorder(),
                 ),
                 initialValue: _userProfile?.displayName ?? "",
+                maxLength: 25,
                 validator: (value) {
                   if (value == null || value.trim().length < 3) {
                     return 'Mindestens 3 Zeichen erforderlich.';

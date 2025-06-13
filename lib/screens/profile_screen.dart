@@ -69,18 +69,16 @@ class ProfileScreen extends ConsumerWidget {
 
     return AppScaffold(
       config: config,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 24,
-                  top: 24,
-                ),
-                child: CircleAvatar(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox (height: 24),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
                   radius: 48,
                   backgroundImage: effectiveProfile.photoUrl != null 
                     ? NetworkImage(effectiveProfile.photoUrl!)
@@ -89,45 +87,50 @@ class ProfileScreen extends ConsumerWidget {
                     ? const Icon(Icons.person, size: 32) 
                     : null,
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  effectiveProfile.displayName?.isNotEmpty == true
-                      ? effectiveProfile.displayName!
-                      : 'Kein Name gesetzt',
-                  style: Theme.of(context).textTheme.titleMedium,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      effectiveProfile.displayName?.isNotEmpty == true
+                          ? effectiveProfile.displayName!
+                          : 'Kein Benutzername gesetzt',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+              ],
+            ),          
+            SizedBox (height: 48),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.push('/profile/notifications');
+                },
+                child: const Text(
+                  'Benachrichtigungen',
                 ),
               ),
-            ],
-          ),          
-          SizedBox (height: 48,),
-          OutlinedButton.icon(
-            onPressed: () {
-              context.push('/profile/notifications');
-            },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.black,
-              backgroundColor: const Color(0xFF8D6CCB),
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 72),
-              side: BorderSide.none,
             ),
-            icon: const Icon(Icons.start),
-            label: const Text('Benachrichtigungen'),
-          ),
-          const SizedBox(height: 32),
-          // 🛠️ Dev-Reset-Button
-          OutlinedButton.icon(
-            onPressed: () => _resetLocalDatabase(context),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.redAccent,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 60),
+            const Spacer(),
+            // 🛠️ Dev-Reset-Button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _resetLocalDatabase(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.redAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 60),
+                ),
+                icon: const Icon(Icons.delete_forever),
+                label: const Text('Reset Local Database'),
+              ),
             ),
-            icon: const Icon(Icons.delete_forever),
-            label: const Text('Reset Local Database'),
-          ),
-        ],
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   },

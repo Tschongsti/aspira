@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
+import 'package:aspira/theme/color_schemes.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/icon_picker.dart';
@@ -127,19 +128,6 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
     }
   }
 
-  //void _pickIcon() async {
-  //  IconData? icon = await IconPicker.showPicker(
-  //    context,
-  //    iconPackModes: [IconPack.material],
-  //  );
-
-  //  if (icon != null) {
-  //    setState(() {
-  //      _selectedIcon = icon;
-  //    });
-  //  }
-  //}
-
   @override
   Widget build(BuildContext context) {
     final isEditMode = widget.initialData != null;
@@ -254,6 +242,9 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
                     onPressed: _isSubmitting
                       ? null
                       : _toggleStatus,
+                    style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                      backgroundColor: WidgetStateProperty.all(kAspiraBrown),
+                    ),
                     child: _isSubmitting
                       ? const SizedBox(
                           height: 16,
