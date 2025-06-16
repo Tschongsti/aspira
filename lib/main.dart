@@ -21,13 +21,20 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  print('🚀 Widgets initialisiert');
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  print('🔥 Firebase wurde initialisiert');
+
   await initializeDateFormatting('de_CH', null);
+  print('📅 Datumslokalisierung initialisiert');
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]).then((fn) {
+  print('🧭 Orientierung gesetzt, App startet');
   runApp(
     UncontrolledProviderScope(
       container: container,

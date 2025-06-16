@@ -15,7 +15,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.aspira"
+    namespace = "ch.lukas.aspira"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
@@ -48,6 +48,8 @@ android {
         }   
     }
 
+    println("💥 Aktiver Keystore: ${signingConfigs.getByName("release").storeFile}")
+
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
@@ -59,4 +61,12 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Importiere das BoM (Bill of Materials) für Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+
+    // Firebase Auth Library
+    implementation("com.google.firebase:firebase-auth")
 }

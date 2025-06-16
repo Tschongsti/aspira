@@ -1,4 +1,4 @@
-package com.example.aspira
+package ch.lukas.aspira
 
 import io.flutter.embedding.android.FlutterActivity
 
