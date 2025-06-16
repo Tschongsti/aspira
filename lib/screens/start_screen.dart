@@ -23,14 +23,6 @@ class _StartScreenState extends State<StartScreen> {
   var _enteredPassword = '';
   var _isAuthenticating = false;
 
-  String? _authStatus;
-
-  @override
-  void initState() {
-    super.initState();
-    _testAnonymousSignIn(); // 👉 Hier direkt beim Start ausführen
-  }
-
   void _submit() async {
     final isValid = _form.currentState!.validate();
 
@@ -56,7 +48,6 @@ class _StartScreenState extends State<StartScreen> {
 
       } 
     } on FirebaseAuthException catch (error) {
-        print('🔥 Firebase Auth Error: ${error.code} - ${error.message}');
         String message = 'Authentifizierung fehlgeschlagen';
 
         if (error.code == 'user-not-found') {
@@ -182,18 +173,6 @@ class _StartScreenState extends State<StartScreen> {
                                 : 'Ich habe schon ein Benutzerkonto'),
                             ),
                           ),
-                          if (_authStatus != null)
-                            Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Text(
-                                _authStatus!,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
                         ],
                       ),
                     ),
@@ -206,24 +185,6 @@ class _StartScreenState extends State<StartScreen> {
       ),
     );
   }
-
-Future<void> _testAnonymousSignIn() async {
-  try {
-    final result = await FirebaseAuth.instance.signInAnonymously();
-    setState(() {
-      _authStatus = '✅ Anonymer Login erfolgreich: ${result.user?.uid}';
-    });
-  } on FirebaseAuthException catch (e) {
-    setState(() {
-      _authStatus = '🔴 Firebase Auth Error (anon): ${e.code} - ${e.message}';
-    });
-  } catch (e) {
-    setState(() {
-      _authStatus = '❌ Unerwarteter Fehler (anon): $e';
-    });
-  }
-}
-
 }
 
 

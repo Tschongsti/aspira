@@ -11,3 +11,7 @@ Version 0.2.0
 - Lokale Speicherung (nur ein Nutzer, kein Sync über Geräte)
 - Dark mode nicht unterstützt
 - "Reset Local Database" --> Dev-Option
+
+Version 0.2.1
+
+🐞 Fehlerbehebungen: Login via Firebase
