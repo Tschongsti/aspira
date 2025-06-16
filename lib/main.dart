@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +23,15 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // DNS-Check: funktioniert nur, wenn Netzwerk + DNS im Release korrekt ist
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    print('📶 DNS erfolgreich: ${result.first.address}');
+  } catch (e) {
+    print('❌ DNS-Fehler: $e');
+  }
+  
   print('🚀 Widgets initialisiert');
 
   await Firebase.initializeApp(
