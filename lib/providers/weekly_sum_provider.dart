@@ -22,6 +22,6 @@ final weeklySumProvider = FutureProvider.family
   );
 
   return result
-      .map((item) => ExecutionEntry.fromMap(item).duration)
+      .map((item) => ExecutionEntry.fromLocalMap(item).duration)
       .fold<Duration>(Duration.zero, (sum, dur) => sum + dur);
 });

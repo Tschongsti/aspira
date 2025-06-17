@@ -21,6 +21,6 @@ final dailyExecutionProvider = FutureProvider.family
       ],
     );
 
-    return result.map((item) => ExecutionEntry.fromMap(item)).toList();
+    return result.map((item) => ExecutionEntry.fromLocalMap(item)).toList();
   },
 );

@@ -13,7 +13,7 @@ final totalLoggedTimeProvider = FutureProvider.family<Duration, String>((ref, ta
   );
 
   final totalDuration = data
-      .map((item) => ExecutionEntry.fromMap(item).duration)
+      .map((item) => ExecutionEntry.fromLocalMap(item).duration)
       .fold<Duration>(Duration.zero, (sum, dur) => sum + dur);
 
   return totalDuration;

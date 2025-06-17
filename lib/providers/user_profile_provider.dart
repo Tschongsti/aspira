@@ -1,19 +1,32 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:sqflite/sqflite.dart';
 
 import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/data/database.dart';
+import 'package:aspira/utils/db_helpers.dart';
 
 class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
-  UserProfileNotifier() : super(const AsyncLoading()) {
+  UserProfileNotifier(this.ref) : super(const AsyncLoading()) {
     loadProfile();
   }
 
+  final Ref ref;
+
   Future<void> loadProfile() async {
     try {
-      final db = await getDatabase();
-      final result = await db.query('user_profile', limit: 1);
+      final uid = ref.read(firebaseUidProvider);
+      if (uid == null) {
+        state = const AsyncValue.data(null);
+        return;
+      }
+      
+      final result = await queryById(
+        table: 'user_profile',
+        id: uid,
+      );
 
     if (result.isNotEmpty) {
       state = AsyncValue.data(UserProfile.fromMap(result.first));
@@ -56,5 +69,13 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
 }
 
 final userProfileProvider = StateNotifierProvider<UserProfileNotifier, AsyncValue<UserProfile?>>(
-  (ref) => UserProfileNotifier(),
+  (ref) => UserProfileNotifier(ref),
 );
+
+final firebaseUserProvider = Provider<User?>((ref) {
+  return FirebaseAuth.instance.currentUser;
+});
+
+final firebaseUidProvider = Provider<String?>((ref) {
+  return ref.watch(firebaseUserProvider)?.uid;
+});
