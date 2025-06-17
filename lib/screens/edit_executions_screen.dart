@@ -47,7 +47,7 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
     );
 
     setState(() {
-      _entries = data.map((row) => ExecutionEntry.fromMap(row)).toList();
+      _entries = data.map((row) => ExecutionEntry.fromLocalMap(row)).toList();
       _isLoading = false;
     });
   }

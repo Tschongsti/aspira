@@ -38,6 +38,21 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
     );
     state = AsyncValue.data(updated);
   }
+
+  Future<void> createIfNotExists(String id, String email) async {
+    final db = await getDatabase();
+    final existing = await db.query(
+      'user_profile',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (existing.isEmpty) {
+      final profile = UserProfile.empty(id, email);
+      await db.insert('user_profile', profile.toMap());
+      state = AsyncValue.data(profile);
+    }
+  }
+
 }
 
 final userProfileProvider = StateNotifierProvider<UserProfileNotifier, AsyncValue<UserProfile?>>(

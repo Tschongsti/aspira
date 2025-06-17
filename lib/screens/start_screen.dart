@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/theme/color_schemes.dart';
 
 final _firebase = FirebaseAuth.instance;
 
-class StartScreen extends StatefulWidget {
+class StartScreen extends ConsumerStatefulWidget {
   const StartScreen ({super.key});
 
   @override
-  State<StartScreen> createState() {
+  ConsumerState<StartScreen> createState() {
     return _StartScreenState();
   }
 }
 
-class _StartScreenState extends State<StartScreen> {
+class _StartScreenState extends ConsumerState<StartScreen> {
   final _form = GlobalKey<FormState>();
   
   var _isLogin = true;
@@ -46,7 +49,13 @@ class _StartScreenState extends State<StartScreen> {
           email: _enteredEmail,
           password: _enteredPassword);
 
-      } 
+      }
+
+      final user = FirebaseAuth.instance.currentUser!;
+
+      await ref.read(userProfileProvider.notifier)
+        .createIfNotExists(user.uid, user.email ?? '');
+
     } on FirebaseAuthException catch (error) {
         String message = 'Authentifizierung fehlgeschlagen';
 

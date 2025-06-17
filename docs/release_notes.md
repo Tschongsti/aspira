@@ -15,3 +15,7 @@ Version 0.2.0
 Version 0.2.1
 
 🐞 Fehlerbehebungen: Login via Firebase
+
+Version 0.2.2
+
+🐞 Fehlerbehebungen: Login via Firebase Teil 2

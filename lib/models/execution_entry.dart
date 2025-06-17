@@ -32,7 +32,7 @@ class ExecutionEntry {
     };
   }
 
-  factory ExecutionEntry.fromMap(Map<String, dynamic> map) {
+  factory ExecutionEntry.fromLocalMap(Map<String, dynamic> map) {
     return ExecutionEntry(
       id: map['id'],
       taskId: map['taskId'],
