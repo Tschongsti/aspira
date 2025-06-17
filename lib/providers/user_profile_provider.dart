@@ -10,19 +10,27 @@ import 'package:aspira/utils/db_helpers.dart';
 
 class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   UserProfileNotifier(this.ref) : super(const AsyncLoading()) {
+    // Beim Start inital laden
     loadProfile();
+
+    // Wenn sich UID ändert (z. B. Login/Logout), erneut laden
+    ref.listen<String?>(firebaseUidProvider, (prev, next) {
+      if (prev != next) {
+        loadProfile();
+      }
+    });
   }
 
   final Ref ref;
 
   Future<void> loadProfile() async {
-    try {
-      final uid = ref.read(firebaseUidProvider);
-      if (uid == null) {
+    final uid = ref.read(firebaseUidProvider);
+    if (uid == null) {
         state = const AsyncValue.data(null);
         return;
-      }
-      
+    }
+    
+    try {
       final result = await queryById(
         table: 'user_profile',
         id: uid,
@@ -40,27 +48,47 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
 
   Future<void> saveProfile(UserProfile profile) async {
     final db = await getDatabase();
+
+    final uid = ref.read(firebaseUidProvider);
+    if (uid == null) {
+      state = const AsyncValue.data(null);
+      return;
+    }
+
     final updated = profile.copyWith(
+      id: uid,
       updatedAt: DateTime.now(),
       isDirty: true,
     );
+
     await db.insert(
       'user_profile',
       updated.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+
     state = AsyncValue.data(updated);
   }
 
   Future<void> createIfNotExists(String id, String email) async {
     final db = await getDatabase();
+
+    final uid = ref.read(firebaseUidProvider);
+    final user = ref.read(firebaseUserProvider);
+    
+    if (uid == null || user?.email == null) {
+      state = const AsyncValue.data(null);
+      return;
+    }
+
     final existing = await db.query(
       'user_profile',
       where: 'id = ?',
-      whereArgs: [id],
+      whereArgs: [uid],
     );
+
     if (existing.isEmpty) {
-      final profile = UserProfile.empty(id, email);
+      final profile = UserProfile.empty(uid, user!.email!);
       await db.insert('user_profile', profile.toMap());
       state = AsyncValue.data(profile);
     }
