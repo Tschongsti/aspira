@@ -5,6 +5,7 @@ enum Type { task, quantity, time }
 
 abstract class TrackableTask {
   final String id;
+  final String userId;
   final String title;
   final String description;
   final IconData iconData;
@@ -18,8 +19,9 @@ abstract class TrackableTask {
 
   final Type type;
 
-  const TrackableTask({
+  TrackableTask({
     required this.id,
+    required this.userId,
     required this.title,
     required this.description,
     required this.iconData,
@@ -30,7 +32,7 @@ abstract class TrackableTask {
     required this.updatedAt,
     required this.isDirty,
     required this.type,
-  });
+  }) : assert(userId.isNotEmpty); // Debug-Check (keine Task ohne userId erfassbar)
 
   String get parentCollection; // FokusTätigkeit, Gewohnheit, ToDo, ToRelax
 

@@ -14,6 +14,7 @@ class FokusTaetigkeit extends TrackableTask {
   final Duration weeklyGoal;
   
   FokusTaetigkeit({
+    required super.userId,
     required super.title,
     required super.description,
     required super.iconData,
@@ -62,6 +63,7 @@ class FokusTaetigkeit extends TrackableTask {
   Map<String, dynamic> toLocalMap() {
     return {
       'id': id,
+      'userId': userId,
       'title': title,
       'description': description,
       'iconCodePoint': iconData.codePoint,
@@ -80,6 +82,7 @@ class FokusTaetigkeit extends TrackableTask {
   factory FokusTaetigkeit.fromLocalMap(Map<String, dynamic> map) {
     return FokusTaetigkeit(
       id: map['id'],
+      userId: map['userId'] ?? '',
       title: map['title'],
       description: map['description'] ?? '',
       iconData: map['iconCodePoint'] != null
@@ -103,6 +106,7 @@ class FokusTaetigkeit extends TrackableTask {
 
   FokusTaetigkeit copyWith({
     String? id,
+    String? userId,
     String? title,
     String? description,
     IconData? iconData,
@@ -116,6 +120,7 @@ class FokusTaetigkeit extends TrackableTask {
   }) {
     return FokusTaetigkeit(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       title: title ?? this.title,
       description: description ?? this.description,
       iconData: iconData ?? this.iconData,

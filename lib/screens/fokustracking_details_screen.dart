@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
+import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/theme/color_schemes.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
@@ -49,8 +50,15 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
     setState(() => _isSubmitting = true);
     final notifier = ref.read(userFokusActivitiesProvider.notifier);
 
+    final uid = ref.read(firebaseUidProvider);
+      if (uid == null || uid.isEmpty) {
+        debugPrint('🛑 FokustrackingDetailsScreenState_toggleStatus: keine gültige userId verfügbar');
+        return;
+      }
+
     final toggled = FokusTaetigkeit(
       id: widget.initialData!.id,
+      userId: uid,
       title: widget.initialData!.title,
       description: widget.initialData!.description,
       iconData: widget.initialData!.iconData,
@@ -90,10 +98,17 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
     if (!isValid) return;
 
     _formKey.currentState!.save();
-    setState(() => _isSubmitting = true); 
+    setState(() => _isSubmitting = true);
+
+    final uid = ref.read(firebaseUidProvider);
+      if (uid == null || uid.isEmpty) {
+        debugPrint('🛑 FokustrackingDetailsScreenState_saveForm: keine gültige userId verfügbar');
+        return;
+      }
 
     final updated = FokusTaetigkeit(
       id: widget.initialData?.id, // bleibt gleich bei Update
+      userId: uid,     
       title: _title,
       description: _description,
       iconData: _selectedIcon,
@@ -152,7 +167,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Form(
-                    key: _formKey, // für was?
+                    key: _formKey, // zum Validieren und Speichern der Formulareingaben
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [

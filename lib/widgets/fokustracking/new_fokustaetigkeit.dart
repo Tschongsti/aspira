@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/utils/icon_picker.dart';
 
-class NewFokustaetigkeit extends StatefulWidget {
+
+class NewFokustaetigkeit extends ConsumerStatefulWidget {
   const NewFokustaetigkeit({super.key, required this.onAddFokustaetigkeit});
 
   final void Function(FokusTaetigkeit fokusTaetigkeit) onAddFokustaetigkeit;
 
   @override
-  State<NewFokustaetigkeit> createState () {
+  ConsumerState<NewFokustaetigkeit> createState () {
     return _NewFokustaetigkeitState();
   }
 }
 
-class _NewFokustaetigkeitState extends State<NewFokustaetigkeit> {
+class _NewFokustaetigkeitState extends ConsumerState<NewFokustaetigkeit> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _weeklyGoalController = TextEditingController();
@@ -49,8 +53,15 @@ void _submitTaetigkeitData () {
       return;
      }
     
+    final uid = ref.read(firebaseUidProvider);
+      if (uid == null || uid.isEmpty) {
+        debugPrint('🛑 NewFokustaetigkeitsState_submitTaetigkeitData: keine gültige userId verfügbar');
+        return;
+      }
+
     widget.onAddFokustaetigkeit(  
       FokusTaetigkeit(    
+        userId: uid,
         title: _titleController.text,
         description: _descriptionController.text,
         iconData: _selectedIcon,
