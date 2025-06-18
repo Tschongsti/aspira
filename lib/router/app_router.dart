@@ -1,13 +1,10 @@
-import 'package:aspira/main.dart';
-import 'package:aspira/models/fokus_taetigkeiten.dart';
-import 'package:aspira/screens/edit_executions_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:aspira/main.dart';
 import 'package:aspira/models/user_profile.dart';
+import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/visited_screens_provider.dart';
 import 'package:aspira/router/router_notifier.dart';
@@ -25,6 +22,7 @@ import 'package:aspira/screens/gewohnheitstracking_screen.dart';
 import 'package:aspira/screens/schlaftracking_screen.dart';
 import 'package:aspira/screens/splash_screen.dart';
 import 'package:aspira/screens/profile_edit_screen.dart';
+import 'package:aspira/screens/edit_executions_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final routerNotifier = RouterNotifier(ref);
@@ -33,21 +31,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: navigatorKey,
     initialLocation: '/splash',
     refreshListenable: routerNotifier,
-    redirect: (context, state) {
-      
-      final user = FirebaseAuth.instance.currentUser;
-      final isLoggedIn = user != null;
-      
-      if (state.uri.toString() == '/splash') {
-        final isLoggedIn = FirebaseAuth.instance.currentUser != null;
-        return isLoggedIn ? '/home' : '/start';
-      }      
-
-      if(!isLoggedIn) return '/start';
-      if (isLoggedIn && state.uri.toString() == '/start') return '/home';
-
-      return null;
-    },
     routes: [
       GoRoute(
         path: '/splash',

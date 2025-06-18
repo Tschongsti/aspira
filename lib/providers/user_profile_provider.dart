@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,24 +9,26 @@ import 'package:sqflite/sqflite.dart';
 import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/data/database.dart';
 import 'package:aspira/utils/db_helpers.dart';
+import 'package:aspira/providers/auth_provider.dart';
 
 class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   UserProfileNotifier(this.ref) : super(const AsyncLoading()) {
-    // Beim Start inital laden
-    loadProfile();
-
-    // Wenn sich UID ändert (z. B. Login/Logout), erneut laden
-    ref.listen<String?>(firebaseUidProvider, (prev, next) {
-      if (prev != next) {
-        loadProfile();
-      }
-    });
+    debugPrint('[UserProfileNotifier] Konstruktor wurde aufgerufen');
   }
 
   final Ref ref;
 
   Future<void> loadProfile() async {
-    final uid = ref.read(firebaseUidProvider);
+    debugPrint('[UserProfileNotifier] loadProfile triggered');
+    
+    final authAsync = ref.read(authStateProvider);
+
+    debugPrint('[UserProfileNotifier] authStateProvider: $authAsync');
+
+    final uid = authAsync.value?.uid;
+
+    debugPrint('[UserProfileNotifier] UID: $uid');
+
     if (uid == null) {
         state = const AsyncValue.data(null);
         return;
@@ -91,6 +95,7 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
       final profile = UserProfile.empty(uid, user!.email!);
       await db.insert('user_profile', profile.toMap());
       state = AsyncValue.data(profile);
+      debugPrint('[UserProfileNotifier] createIfNotExists aufgerufen für UID: $uid');
     }
   }
 

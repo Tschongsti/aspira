@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
+
 import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/theme/color_schemes.dart';
 
@@ -49,12 +51,16 @@ class _StartScreenState extends ConsumerState<StartScreen> {
           email: _enteredEmail,
           password: _enteredPassword);
 
-      }
+        final user = FirebaseAuth.instance.currentUser!;
+        await ref.read(userProfileProvider.notifier)
+        .createIfNotExists(
+          user.uid,
+          user.email ?? '',
+        );
+      } 
 
-      final user = FirebaseAuth.instance.currentUser!;
-
-      await ref.read(userProfileProvider.notifier)
-        .createIfNotExists(user.uid, user.email ?? '');
+      // Nach Login zur Splash-Seite → diese macht Redirect
+      if (mounted) context.go('/splash');
 
     } on FirebaseAuthException catch (error) {
         String message = 'Authentifizierung fehlgeschlagen';
@@ -71,17 +77,14 @@ class _StartScreenState extends ConsumerState<StartScreen> {
           message = 'Zu schwaches Passwort';
         }
 
-        if (!mounted) return;
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(SnackBar(content: Text(message)));
+        }
 
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message),
-          ),
-        );
-        
-        setState(() {
-          _isAuthenticating = false;
-        });
+      } finally {
+        if (mounted) setState(() => _isAuthenticating = false);
       }
     }
   

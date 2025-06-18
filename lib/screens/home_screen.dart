@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:intl/intl.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:go_router/go_router.dart';
@@ -13,6 +12,7 @@ import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/logout.dart';
 import 'package:aspira/widgets/Homescreen/tracking_section.dart';
 
 class HomeScreen extends ConsumerStatefulWidget{
@@ -68,8 +68,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBarActions: [
         IconButton(
           icon: Icon(Icons.exit_to_app),
-          onPressed: () {
-            FirebaseAuth.instance.signOut();
+          onPressed: () async {
+            await logout (ref, context);  
+            if (context.mounted) context.go('/splash');
           },
         ),
         IconButton(
