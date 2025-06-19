@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
+import 'package:aspira/providers/auth_provider.dart';
 import 'package:aspira/providers/user_focusactivities_provider.dart';
-import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/theme/color_schemes.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';

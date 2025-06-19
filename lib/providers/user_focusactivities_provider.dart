@@ -6,15 +6,29 @@ import 'package:sqflite/sqflite.dart';
 
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
+import 'package:aspira/providers/auth_provider.dart';
 import 'package:aspira/data/database.dart';
 
 class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
-  UserFokusActivitiesNotifier() : super(const []);
+  UserFokusActivitiesNotifier(this.ref) : super(const []);
+
+  final Ref ref;
 
   Future<void> loadFokusActivities() async {
     try {
+      final uid = ref.read(firebaseUidProvider);
+      debugPrint('🧩 UID beim Laden: $uid');
+      if (uid == null) {
+        debugPrint('🛑 Kein UID vorhanden: keine Fokustätigkeiten geladen');
+        return;
+      }
+            
       final db = await getDatabase();
-      final data = await db.query('user_focusactivities');
+      final data = await db.query(
+        'user_focusactivities',
+        where: 'userId = ?',
+        whereArgs: [uid],  
+      );
 
       final fokusList = data
         .map((row) => FokusTaetigkeit.fromLocalMap(row))
@@ -33,6 +47,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     final previousState = [...state];
     try {
       final db = await getDatabase();
+      debugPrint('[ADD] ${fokus.toLocalMap()}');
       await db.insert(
         'user_focusactivities',
         fokus.toLocalMap(),
@@ -146,5 +161,5 @@ final showInactiveProvider = StateProvider<bool>((ref) => false);
 // Hauptprovider
 final userFokusActivitiesProvider =
     StateNotifierProvider<UserFokusActivitiesNotifier, List<FokusTaetigkeit>>(
-  (ref) => UserFokusActivitiesNotifier(),
+  (ref) => UserFokusActivitiesNotifier(ref),
 );

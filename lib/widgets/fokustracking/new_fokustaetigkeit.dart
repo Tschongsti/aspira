@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aspira/models/fokus_taetigkeiten.dart';
-import 'package:aspira/providers/user_profile_provider.dart';
+import 'package:aspira/providers/auth_provider.dart';
 import 'package:aspira/utils/icon_picker.dart';
 
 

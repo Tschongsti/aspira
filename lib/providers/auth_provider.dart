@@ -11,3 +11,11 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(firebaseAuthProvider).authStateChanges();
 });
+
+final firebaseUidProvider = Provider<String?>((ref) {
+  final authState = ref.watch(authStateProvider);
+  return authState.maybeWhen(
+    data: (user) => user?.uid,
+    orElse: () => null,
+  );
+});

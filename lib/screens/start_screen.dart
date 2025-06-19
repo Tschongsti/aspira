@@ -50,14 +50,14 @@ class _StartScreenState extends ConsumerState<StartScreen> {
         await _firebase.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword);
+      } 
 
-        final user = FirebaseAuth.instance.currentUser!;
+      final user = FirebaseAuth.instance.currentUser!;
         await ref.read(userProfileProvider.notifier)
         .createIfNotExists(
           user.uid,
           user.email ?? '',
         );
-      } 
 
       // Nach Login zur Splash-Seite → diese macht Redirect
       if (mounted) context.go('/splash');

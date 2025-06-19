@@ -77,25 +77,19 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   Future<void> createIfNotExists(String id, String email) async {
     final db = await getDatabase();
 
-    final uid = ref.read(firebaseUidProvider);
-    final user = ref.read(firebaseUserProvider);
-    
-    if (uid == null || user?.email == null) {
-      state = const AsyncValue.data(null);
-      return;
-    }
-
     final existing = await db.query(
       'user_profile',
       where: 'id = ?',
-      whereArgs: [uid],
+      whereArgs: [id],
     );
 
     if (existing.isEmpty) {
-      final profile = UserProfile.empty(uid, user!.email!);
+      final profile = UserProfile.empty(id, email);
       await db.insert('user_profile', profile.toMap());
       state = AsyncValue.data(profile);
-      debugPrint('[UserProfileNotifier] createIfNotExists aufgerufen für UID: $uid');
+      debugPrint('[UserProfileNotifier] createIfNotExists aufgerufen für UID: $id');
+    } else {
+      debugPrint('[UserProfileNotifier] Profil existiert bereits für UID: $id');
     }
   }
 
@@ -107,8 +101,4 @@ final userProfileProvider = StateNotifierProvider<UserProfileNotifier, AsyncValu
 
 final firebaseUserProvider = Provider<User?>((ref) {
   return FirebaseAuth.instance.currentUser;
-});
-
-final firebaseUidProvider = Provider<String?>((ref) {
-  return ref.watch(firebaseUserProvider)?.uid;
 });
