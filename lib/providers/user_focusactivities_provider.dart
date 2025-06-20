@@ -45,7 +45,14 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
   Future<void> addFokusTaetigkeit(FokusTaetigkeit fokus) async {
     final previousState = [...state];
+
     try {
+      final uid = ref.read(firebaseUidProvider);
+      if (uid == null) {
+        debugPrint('🛑 Kein Nutzer eingeloggt: Aktion abgebrochen');
+        return;
+      }
+
       final db = await getDatabase();
       debugPrint('[ADD] ${fokus.toLocalMap()}');
       await db.insert(

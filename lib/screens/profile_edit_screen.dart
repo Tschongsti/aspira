@@ -30,6 +30,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
   late UserProfile? _userProfile;
   File? _profileImage;
+  bool _isSaving = false;
   // bool _isLoading = true;
   
   @override
@@ -75,9 +76,20 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   }
 
   Future<void> _saveProfile() async {
+    
+    setState(() {
+      _isSaving = true;
+    });
+
     final user = FirebaseAuth.instance.currentUser!;
     final isValid = _formKey.currentState!.validate();
-    if (!isValid) return;
+
+    if (!isValid) {
+      setState(() {
+        _isSaving = false;
+      });
+      return;
+    }
 
     _formKey.currentState!.save();
 
@@ -97,22 +109,36 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       }
     }
 
-    final updatedProfile = _userProfile!.copyWith(photoUrl: photoUrl);
-    
+    final updatedProfile = _userProfile!.copyWith(photoUrl: photoUrl);    
     await ref.read(userProfileProvider.notifier).saveProfile(updatedProfile);
     
-    if (mounted) Navigator.of(context).pop(updatedProfile);
+    if (mounted) {
+      setState(() {
+        _isSaving = false;
+      });
+      Navigator.of(context).pop(updatedProfile);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    
     final config = AppScreenConfig(
       title: 'Profil bearbeiten',
       appBarActions: [
-        IconButton(
-          icon: const Icon(Icons.save),
-          onPressed: _saveProfile,
-        ),
+        _isSaving
+          ? const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          : IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: _saveProfile,
+            ),
       ],
     );
     
@@ -122,48 +148,61 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
     final validPhotoUrl = _userProfile?.photoUrl != null && _userProfile!.photoUrl!.startsWith('http');
     
-    return AppScaffold(
-      config: config,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 48,
-                backgroundColor: Colors.grey.shade300,
-                backgroundImage: _profileImage != null 
-                  ? FileImage(_profileImage!)
-                  : validPhotoUrl
-                    ? NetworkImage(_userProfile!.photoUrl!) as ImageProvider
-                    : null,
-                child: _profileImage == null && !validPhotoUrl
-                    ? const Icon(Icons.camera_alt, size: 32)
-                    : null,
-              ),
+    return PopScope<Object?>(
+      canPop: !_isSaving, // Pop wird blockiert, wenn _isSaving == true
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (!didPop && _isSaving) {
+          // User wollte gehen, aber Pop wurde blockiert
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profil wird gespeichert... Bitte warte.'),
             ),
-            const SizedBox(height: 24),
-            Form(
-              key: _formKey,
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Benutzername',
+          );
+        }
+      },
+      child: AppScaffold(
+        config: config,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: _pickImage,
+                child: CircleAvatar(
+                  radius: 48,
+                  backgroundColor: Colors.grey.shade300,
+                  backgroundImage: _profileImage != null 
+                    ? FileImage(_profileImage!)
+                    : validPhotoUrl
+                      ? NetworkImage(_userProfile!.photoUrl!) as ImageProvider
+                      : null,
+                  child: _profileImage == null && !validPhotoUrl
+                      ? const Icon(Icons.camera_alt, size: 32)
+                      : null,
                 ),
-                initialValue: _userProfile?.displayName ?? "",
-                maxLength: 25,
-                validator: (value) {
-                  if (value == null || value.trim().length < 3) {
-                    return 'Mindestens 3 Zeichen erforderlich.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _userProfile = _userProfile!.copyWith(displayName: value!.trim());
-                },
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+              Form(
+                key: _formKey,
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Benutzername',
+                  ),
+                  initialValue: _userProfile?.displayName ?? "",
+                  maxLength: 25,
+                  validator: (value) {
+                    if (value == null || value.trim().length < 3) {
+                      return 'Mindestens 3 Zeichen erforderlich.';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _userProfile = _userProfile!.copyWith(displayName: value!.trim());
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
