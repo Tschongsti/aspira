@@ -19,3 +19,15 @@ Version 0.2.1
 Version 0.2.2
 
 🐞 Fehlerbehebungen: Login via Firebase Teil 2
+
+Version 0.3.0
+
+🚀 Neue Funktionen:
+- Userspezifische Datenhaltung (mehrere User pro Gerät erlaubt)
+
+🐞 Fehlerbehebungen:
+- Zurück-Navigation während Speicherung Profil-Anpassungen blockiert
+
+💡 Known Issues:
+- Dark mode nicht unterstützt
+- "Reset Local Database" --> Dev-Option

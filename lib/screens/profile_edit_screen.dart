@@ -155,7 +155,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
           // User wollte gehen, aber Pop wurde blockiert
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Profil wird gespeichert... Bitte warte.'),
+              content: Text('Profil wird gespeichert. Bitte warten'),
             ),
           );
         }
