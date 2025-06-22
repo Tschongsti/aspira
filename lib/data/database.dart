@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart'as sql;
 import 'package:sqflite/sqlite_api.dart';
-
-import 'package:aspira/providers/auth_provider.dart';
 
 const _dbName = 'aspira.db';
 const _dbVersion = 2;
@@ -78,20 +74,6 @@ Future<void> _runMigrations(Database db, int oldVersion, int newVersion) async {
     debugPrint('🛠️ Migration auf Version 2 gestartet');
 
     await db.execute('ALTER TABLE user_focusactivities ADD COLUMN userId TEXT;');
-
-    final container = ProviderContainer();
-    final uid = container.read(firebaseUidProvider);
-    container.dispose();
-
-    if (uid != null) {
-      await db.execute(
-        'UPDATE user_focusactivities SET userId = ? WHERE userId IS NULL',
-        [uid],
-      );
-      debugPrint('🔄 Bestehende FokusTätigkeiten mit userId: $uid aktualisiert');
-    } else {
-      debugPrint('⚠️ UID bei Migration nicht verfügbar – userId bleibt leer');
-    }
 
     debugPrint('✅ Migration auf Version 2 abgeschlossen');
   }

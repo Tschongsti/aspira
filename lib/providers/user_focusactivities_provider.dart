@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:sqflite/sqflite.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:aspira/models/trackable_task.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/providers/auth_provider.dart';
@@ -14,6 +16,44 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
 
   final Ref ref;
 
+  Future<void> ensureUserIdsForLegacyEntries() async {
+    final uid = ref.read(firebaseUidProvider);
+    if (uid == null) {
+      debugPrint('⚠️ UID nicht verfügbar – kann Legacy-Migration nicht durchführen');
+      return;
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final flagKey = 'userIdMigrationDone_$uid';
+      final alreadyMigrated = prefs.getBool(flagKey) ?? false;
+
+      if (alreadyMigrated) {
+        debugPrint('ℹ️ Migration bereits durchgeführt für UID: $uid');
+        return;
+      }
+
+      final db = await getDatabase();
+      final result = await db.rawUpdate(
+        'UPDATE user_focusactivities SET userId = ? WHERE userId IS NULL OR userId = ""',
+        [uid],
+      );
+
+      if (result > 0) {
+        debugPrint('🔄 Legacy-Migration: $result FokusTätigkeiten mit userId=$uid aktualisiert');
+      } else {
+        debugPrint('ℹ️ Keine veralteten Einträge ohne userId gefunden');
+      }
+
+      await prefs.setBool(flagKey, true);
+      debugPrint('✅ Migration-Flag gesetzt: $flagKey');
+
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler bei Legacy-Migration: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+    
   Future<void> loadFokusActivities() async {
     try {
       final uid = ref.read(firebaseUidProvider);
@@ -22,6 +62,9 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         debugPrint('🛑 Kein UID vorhanden: keine Fokustätigkeiten geladen');
         return;
       }
+
+      // 🧩 UID-basierte Nachmigration sicherstellen
+      await ensureUserIdsForLegacyEntries();
             
       final db = await getDatabase();
       final data = await db.query(
