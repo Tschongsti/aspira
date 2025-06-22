@@ -53,6 +53,7 @@ dependencies:
   flutter_iconpicker: ^4.0.1
   youtube_player_flutter: ^9.1.1
   shared_preferences: ^2.5.3
+  share_plus: ^11.0.0
 
 dev_dependencies:
   flutter_test:

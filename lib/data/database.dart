@@ -10,6 +10,7 @@ const _dbVersion = 2;
 Future<Database> getDatabase() async {
   final dbPath = await sql.getDatabasesPath();
   final dbFullpath = path.join(dbPath, _dbName);
+  debugPrint('📁 Öffne Datenbank: $dbFullpath');
 
   return sql.openDatabase(
     dbFullpath,
@@ -74,7 +75,11 @@ Future<void> _runMigrations(Database db, int oldVersion, int newVersion) async {
     debugPrint('🛠️ Migration auf Version 2 gestartet');
 
     await db.execute('ALTER TABLE user_focusactivities ADD COLUMN userId TEXT;');
+    debugPrint('🧱 Spalte userId ergänzt');
 
     debugPrint('✅ Migration auf Version 2 abgeschlossen');
+  }
+  else {
+    debugPrint('📭 Keine Migration notwendig');
   }
 }

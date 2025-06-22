@@ -32,7 +32,7 @@ Version 0.3.0
 - Dark mode nicht unterstützt
 - "Reset Local Database" --> Dev-Option
 
-Version 0.3.0
+Version 0.3.1
 
 🐞 Fehlerbehebungen:
 - Sauberer Update der DB auf Version 2 mit Migration userId

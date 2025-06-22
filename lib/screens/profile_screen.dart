@@ -1,6 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:path/path.dart' as path;
+import 'package:sqflite/sqflite.dart' as sql;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +34,39 @@ class ProfileScreen extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Lokale Datenbank wurde zurückgesetzt')),
     );
+  }
+
+  Future<void> _exportDatabase(BuildContext context) async {
+    try {
+      final databasesPath = await sql.getDatabasesPath();
+      final dbPath = path.join(databasesPath, 'aspira.db');
+
+      final appDir = await getTemporaryDirectory(); // aus path_provider
+      final exportPath = path.join(appDir.path, 'aspira_export.db');
+
+      final exportFile = File(exportPath);
+      await File(dbPath).copy(exportPath);
+
+      final params = ShareParams(
+        text: 'Hier ist die aktuelle Aspira-Datenbank',
+        files: [XFile(exportFile.path)],
+      );
+
+      final result = await SharePlus.instance.share(params);
+
+      if (result.status == ShareResultStatus.success) {
+        debugPrint('✅ Erfolgreich geteilt!');
+      } else {
+        debugPrint('ℹ️ Teilen abgebrochen oder nicht erfolgreich.');
+      }
+
+    } catch (e) {
+      debugPrint('❌ Fehler beim DB-Export: $e');
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Fehler beim Exportieren der Datenbank')),
+      );
+    }
   }
 
   @override
@@ -117,6 +157,20 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const Spacer(),
             // 🛠️ Dev-Reset-Button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _exportDatabase(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 60),
+                ),
+                icon: const Icon(Icons.file_upload),
+                label: const Text('Export Local DB'),
+              ),
+            ),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
