@@ -35,4 +35,4 @@ Version 0.3.0
 Version 0.3.0
 
 🐞 Fehlerbehebungen:
-- Saubere Migration der DB auf Version 2 mit Hinzufügen userId
+- Sauberer Update der DB auf Version 2 mit Migration userId
