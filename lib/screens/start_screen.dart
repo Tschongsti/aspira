@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 
+import 'package:aspira/data/database.dart';
 import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/theme/color_schemes.dart';
 
@@ -27,6 +28,37 @@ class _StartScreenState extends ConsumerState<StartScreen> {
   var _enteredEmail = '';
   var _enteredPassword = '';
   var _isAuthenticating = false;
+
+  @override
+    void initState() {
+      super.initState();
+      _logDatabaseState(); // Logging beim Start
+    }
+
+  Future<void> _logDatabaseState() async {
+    try {
+      final db = await getDatabase();
+      debugPrint('🧪 Starte DB-Logging vor Login');
+
+      final focusRows = await db.query('user_focusactivities');
+      debugPrint('📘 FOCUS-Einträge:');
+      for (final row in focusRows) {
+        debugPrint('   ➡️ ${row['title']} | userId: ${row['userId']}');
+      }
+
+      final profileRows = await db.query('user_profile');
+      debugPrint('🧑‍💻 PROFILE-Einträge:');
+      for (final row in profileRows) {
+        debugPrint('   📧 ${row['email']} | id: ${row['id']}');
+      }
+
+      final currentUser = FirebaseAuth.instance.currentUser;
+      debugPrint('🧬 Aktueller Firebase UID: ${currentUser?.uid ?? "null"}');
+    } catch (error, stack) {
+      debugPrint('💥 Fehler beim DB-Logging: $error');
+      debugPrintStack(stackTrace: stack);
+    }
+  }
 
   void _submit() async {
     final isValid = _form.currentState!.validate();

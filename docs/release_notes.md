@@ -36,3 +36,14 @@ Version 0.3.1
 
 🐞 Fehlerbehebungen:
 - Sauberer Update der DB auf Version 2 mit Migration userId
+
+Version 0.3.2
+
+🚀 Neue Funktionen:
+- Erweitertes Logging für Debuging und Database Export
+
+Version 0.3.3
+
+🐞 Fehlerbehebungen:
+- Vermeidung von automatischer Sicherung von Backup-Daten bei De-Installation der App
+- Logging von User-Profil und Fokus-Tätigkeiten beim Start der App
