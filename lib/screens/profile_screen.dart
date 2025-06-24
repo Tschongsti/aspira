@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:aspira/repositories/execution_entry_repo.dart';
+import 'package:aspira/repositories/focus_activities_repo.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +18,10 @@ import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
+
+import 'package:aspira/services/sync_service.dart';
+import 'package:aspira/repositories/user_profile_repo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -182,6 +188,60 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 icon: const Icon(Icons.delete_forever),
                 label: const Text('Reset Local Database'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final userId = profile.id; // aus geladenem Profil
+                  final syncService = SyncService(
+                    userProfileRepo: UserProfileRepository(firestore: FirebaseFirestore.instance),
+                    focusActivityRepo: FocusActivitiesRepository(firestore: FirebaseFirestore.instance),
+                    executionRepo: ExecutionEntriesRepository(firestore: FirebaseFirestore.instance),
+                  );
+                  await syncService.syncOnLoginOrStart(userId);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('⬇️ Sync bei Login/Start ausgeführt')),
+                    );
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 60),
+                ),
+                icon: const Icon(Icons.cloud_download),
+                label: const Text('Sync: Login / Start'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final userId = profile.id;
+                  final syncService = SyncService(
+                    userProfileRepo: UserProfileRepository(firestore: FirebaseFirestore.instance),
+                    focusActivityRepo: FocusActivitiesRepository(firestore: FirebaseFirestore.instance),
+                    executionRepo: ExecutionEntriesRepository(firestore: FirebaseFirestore.instance),
+                  );
+                  await syncService.syncOnLogoutOrExit(userId);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('⬆️ Sync bei Logout/Exit ausgeführt')),
+                    );
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 60),
+                ),
+                icon: const Icon(Icons.cloud_upload),
+                label: const Text('Sync: Logout / Exit'),
               ),
             ),
             const SizedBox(height: 24),

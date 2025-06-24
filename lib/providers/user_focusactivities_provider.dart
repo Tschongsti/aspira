@@ -19,7 +19,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
   Future<void> ensureUserIdsForLegacyEntries() async {
     final uid = ref.read(firebaseUidProvider);
     if (uid == null) {
-      debugPrint('⚠️ UID nicht verfügbar – kann Legacy-Migration nicht durchführen');
+      debugPrint('⚠️ UID nicht verfügbar: kann Legacy-Migration nicht durchführen');
       return;
     }
 

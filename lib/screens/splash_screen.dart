@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:aspira/providers/auth_provider.dart';
 import 'package:aspira/providers/user_profile_provider.dart';
+import 'package:aspira/providers/sync_services_provider.dart';
 
 class SplashScreen extends ConsumerWidget {
   const SplashScreen({super.key});
@@ -22,6 +23,8 @@ class SplashScreen extends ConsumerWidget {
           if (user != null) {
             debugPrint('[SplashScreen] Eingeloggt, lade Profil');
             await ref.read(userProfileProvider.notifier).loadProfile();
+            await ref.read(syncServiceProvider).syncOnLoginOrStart(user.uid);
+            debugPrint('[Login] SyncOnLogin erfolgreich abgeschlossen');
             if (context.mounted) context.go('/home');
           } else {
             debugPrint('[SplashScreen] Nicht eingeloggt, gehe zu /start');

@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:aspira/theme/themes.dart';
 import 'package:aspira/router/app_router.dart';
+import 'package:aspira/services/app_lifecyclehandler.dart';
 
 
 var kDarkColorScheme = ColorScheme.fromSeed(
@@ -50,11 +51,13 @@ class AspiraApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router =ref.watch(appRouterProvider);
-    return MaterialApp.router(
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
-      routerConfig: router,
+    return AppLifecycleHandler(
+      child: MaterialApp.router(
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.system,
+        routerConfig: router,
+      ),
     );
   }
 }
