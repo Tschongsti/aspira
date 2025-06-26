@@ -10,13 +10,31 @@ import 'package:aspira/providers/auth_provider.dart';
 import 'package:aspira/providers/sync_services_provider.dart';
 
 Future<void> logout(WidgetRef ref, BuildContext context) async {
-  final user = FirebaseAuth.instance.currentUser;
+  try {
+    final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       await ref.read(syncServiceProvider).syncOnLogoutOrExit(user.uid);
       debugPrint('[Logout] SyncOnLogout erfolgreich abgeschlossen');
     }
-  
-  await FirebaseAuth.instance.signOut();
+  } catch (e) {
+    debugPrint('[Logout] Fehler beim SyncOnLogout: $e');
+  }
+
+  try {
+    await FirebaseAuth.instance.signOut();
+    debugPrint('[Logout] FirebaseAuth signOut erfolgreich');
+
+    // 🧠 Warten bis Firebase wirklich null zurückgibt
+    int retries = 0;
+    while (FirebaseAuth.instance.currentUser != null && retries < 10) {
+      debugPrint('[Logout] Warte auf currentUser == null...');
+      await Future.delayed(const Duration(milliseconds: 50));
+      retries++;
+    }
+
+  } catch (e) {
+    debugPrint('[Logout] Fehler beim Firebase signOut: $e');
+  }
 
   // Zustand nur bei StateNotifier/AsyncNotifier/ChangeNotifier-basierten Providern invalidieren
 

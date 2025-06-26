@@ -12,49 +12,45 @@ class UserProfileRepository {
 
   /// Download aus Firestore → lokal mergen
   Future<void> downloadAndMerge(String userId) async {
-    try {
-      final db = await getDatabase();
-      final doc = await firestore.collection('user_profiles').doc(userId).get();
+    final db = await getDatabase();
+    final doc = await firestore.collection('user_profiles').doc(userId).get();
 
-      if (!doc.exists) {
-        debugPrint('📭 Kein UserProfile in Firestore gefunden für $userId');
-        return;
-      }
+    if (!doc.exists) {
+      debugPrint('📭 Kein UserProfile in Firestore gefunden für $userId');
+      throw Exception('Kein Remote-Profil gefunden');
+    }
 
-      final remote = UserProfile.fromMap(doc.data()!);
+    final remote = UserProfile.fromMap(doc.data()!);
 
-      final localResult = await db.query(
-        'user_profile',
-        where: 'id = ?',
-        whereArgs: [userId],
-        limit: 1,
-      );
+    final localResult = await db.query(
+      'user_profile',
+      where: 'id = ?',
+      whereArgs: [userId],
+      limit: 1,
+    );
 
-      if (localResult.isEmpty) {
-        await db.insert('user_profile', {
-          ...remote.toMap(),
-          'isDirty': 0,
-        });
-        debugPrint('⬇️ UserProfile aus Firestore neu eingefügt: ${remote.email}');
+    if (localResult.isEmpty) {
+      await db.insert('user_profile', {
+        ...remote.toMap(),
+        'isDirty': 0,
+      });
+      debugPrint('⬇️ UserProfile aus Firestore neu eingefügt: ${remote.email}');
+    } else {
+      final local = UserProfile.fromMap(localResult.first);
+      if (remote.updatedAt.isAfter(local.updatedAt)) {
+        await db.update(
+          'user_profile',
+          {
+            ...remote.toMap(),
+            'isDirty': 0,
+          },
+          where: 'id = ?',
+          whereArgs: [userId],
+        );
+        debugPrint('🔄 UserProfile aus Firestore aktualisiert: ${remote.email}');
       } else {
-        final local = UserProfile.fromMap(localResult.first);
-        if (remote.updatedAt.isAfter(local.updatedAt)) {
-          await db.update(
-            'user_profile',
-            {
-              ...remote.toMap(),
-              'isDirty': 0,
-            },
-            where: 'id = ?',
-            whereArgs: [userId],
-          );
-          debugPrint('🔄 UserProfile aus Firestore aktualisiert: ${remote.email}');
-        } else {
-          debugPrint('⏭️ Lokales UserProfile ist aktueller: kein Update nötig');
-        }
+        debugPrint('⏭️ Lokales UserProfile ist aktueller: kein Update nötig');
       }
-    } catch (error) {
-      debugPrint('❌ Fehler beim Download von UserProfile: $error');
     }
   }
 

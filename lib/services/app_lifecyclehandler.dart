@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:aspira/providers/sync_services_provider.dart';
+import 'package:aspira/providers/user_profile_provider.dart';
+import 'package:aspira/providers/user_focusactivities_provider.dart';
+import 'package:aspira/providers/daily_execution_provider.dart';
 
 class AppLifecycleHandler extends ConsumerStatefulWidget {
   final Widget child;
@@ -29,7 +32,7 @@ class _AppLifecycleHandlerState extends ConsumerState<AppLifecycleHandler> with 
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) return;
@@ -37,7 +40,17 @@ class _AppLifecycleHandlerState extends ConsumerState<AppLifecycleHandler> with 
     switch (state) {
       case AppLifecycleState.resumed:
         debugPrint('[Lifecycle] App resumed');
-        ref.read(syncServiceProvider).syncOnLoginOrStart(user.uid);
+        await ref.read(syncServiceProvider).syncOnLoginOrStart(user.uid);
+
+        // Invalidiere Provider
+        ref.invalidate(userProfileProvider);
+        ref.invalidate(userFokusActivitiesProvider);
+        ref.invalidate(dailyExecutionProvider); // optional, da dieser automatisch geresettet werden sollte
+
+        // Trigger Neuladung
+        ref.read(userProfileProvider.notifier).loadProfile(user);
+        ref.read(userFokusActivitiesProvider.notifier).loadFokusActivities();
+
         break;
 
       case AppLifecycleState.inactive:

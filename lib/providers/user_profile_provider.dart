@@ -10,6 +10,7 @@ import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/data/database.dart';
 import 'package:aspira/utils/db_helpers.dart';
 import 'package:aspira/providers/auth_provider.dart';
+import 'package:aspira/providers/repos/user_profile_repo_provider.dart';
 
 class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   UserProfileNotifier(this.ref) : super(const AsyncLoading()) {
@@ -18,33 +19,24 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
 
   final Ref ref;
 
-  Future<void> loadProfile() async {
+  Future<void> loadProfile(User user) async {
     debugPrint('[UserProfileNotifier] loadProfile triggered');
-    
-    final authAsync = ref.read(authStateProvider);
 
-    debugPrint('[UserProfileNotifier] authStateProvider: $authAsync');
+    final uid = user.uid;
 
-    final uid = authAsync.value?.uid;
+    debugPrint('[UserProfileNotifier] UID (via param): $uid');
 
-    debugPrint('[UserProfileNotifier] UID: $uid');
-
-    if (uid == null) {
-        state = const AsyncValue.data(null);
-        return;
-    }
-    
     try {
       final result = await queryById(
         table: 'user_profile',
         id: uid,
       );
 
-    if (result.isNotEmpty) {
-      state = AsyncValue.data(UserProfile.fromMap(result.first));
-    } else {
-      state = const AsyncValue.data(null);
-    }
+      if (result.isNotEmpty) {
+        state = AsyncValue.data(UserProfile.fromMap(result.first));
+      } else {
+        state = const AsyncValue.data(null);
+      }
     } catch (error, stack) {
       state = AsyncValue.error(error, stack);
     }
@@ -77,6 +69,7 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   Future<void> createIfNotExists(String id, String email) async {
     final db = await getDatabase();
 
+    // 🔍 Check: Gibt es das Profil lokal?
     final existing = await db.query(
       'user_profile',
       where: 'id = ?',
@@ -84,15 +77,28 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
     );
 
     if (existing.isEmpty) {
-      final profile = UserProfile.empty(id, email);
-      await db.insert('user_profile', profile.toMap());
-      state = AsyncValue.data(profile);
-      debugPrint('[UserProfileNotifier] createIfNotExists aufgerufen für UID: $id');
+      debugPrint('[UserProfileNotifier] Kein lokales Profil vorhanden für UID: $id');
+
+      try {
+        // 🔁 Versuche, das Profil aus Firestore zu laden und zu mergen
+        await ref.read(userProfileRepositoryProvider).downloadAndMerge(id);
+        
+      } catch (e) {
+        // 🔧 Wenn kein Remote-Profil vorhanden ist → leeres Profil erstellen
+        debugPrint('[UserProfileNotifier] Remote-Profil NICHT gefunden → erstelle leeres Profil für UID: $id');
+
+        final profile = UserProfile.empty(id, email);
+        await db.insert('user_profile', profile.toMap());
+        state = AsyncValue.data(profile);
+        return;
+      }
+
+      debugPrint('[UserProfileNotifier] Remote-Profil erfolgreich geladen und gemergt für UID: $id');
+
     } else {
-      debugPrint('[UserProfileNotifier] Profil existiert bereits für UID: $id');
+      debugPrint('[UserProfileNotifier] Profil existiert bereits lokal für UID: $id');
     }
   }
-
 }
 
 final userProfileProvider = StateNotifierProvider<UserProfileNotifier, AsyncValue<UserProfile?>>(
