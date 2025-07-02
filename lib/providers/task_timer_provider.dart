@@ -60,6 +60,7 @@ class TaskTimerNotifier extends StateNotifier<Map<String, TaskTimer>> {
       taskId: taskId,
       start: _currentExecutions[taskId]!,
       end: DateTime.now(),
+      status: ExecutionEntryStatus.active,
       isDirty: true,
       isArchived: false,
       updatedAt: DateTime.now(),

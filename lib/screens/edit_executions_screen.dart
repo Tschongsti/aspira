@@ -42,8 +42,8 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
 
     final data = await db.query(
       'execution_entries',
-      where: 'taskId = ? AND start >= ? AND start < ? AND isArchived = 0',
-      whereArgs: [widget.task.id, start.toLocal().toIso8601String(), end.toLocal().toIso8601String()],
+      where: 'taskId = ? AND start >= ? AND start < ? AND isArchived = 0 AND status = ?',
+      whereArgs: [widget.task.id, start.toLocal().toIso8601String(), end.toLocal().toIso8601String(), ExecutionEntryStatus.active.name],
     );
 
     setState(() {
@@ -105,41 +105,35 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
       return;
     }
 
-    final db = await getDatabase();
-    final startOfDay = DateTime(widget.selectedDate.year, widget.selectedDate.month, widget.selectedDate.day);
-    final endOfDay = startOfDay.add(const Duration(days: 1)).subtract(const Duration(milliseconds: 1));
+    final previousEntries = [..._entries];
 
-    final existing = await db.query(
-      'execution_entries',
-      where: 'taskId = ? AND start >= ? AND start < ?',
-      whereArgs: [widget.task.id, startOfDay.toLocal().toIso8601String(), endOfDay.toLocal().toIso8601String()],
-    );
+    try {
+      final db = await getDatabase();
+      final batch = db.batch();
 
-    final existingIds = existing.map((item) => item['id'] as String).toSet();
-    final currentIds = _entries.map((item) => item.id).toSet();
+      for (final entry in _entries) {
+        batch.insert(
+          'execution_entries',
+          entry.toLocalMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
 
-    final idsToDelete = existingIds.difference(currentIds);
+      await batch.commit(noResult: true);
+      
+      ref.invalidate(weeklySumProvider(widget.task)); // Provider invaldieren, damit Homescreen neue Daten lädt
+      ref.invalidate(totalLoggedTimeProvider(widget.task.id));
 
-    final batch = db.batch();
-    for (final id in idsToDelete) {
-      batch.delete('execution_entries', where: 'id = ?', whereArgs: [id]);
-    }
+      if (!mounted) return;
+      Navigator.of(context).pop();
 
-    for (final entry in _entries) {
-      batch.insert(
-        'execution_entries',
-        entry.toLocalMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-
-    await batch.commit(noResult: true);
-    
-    ref.invalidate(weeklySumProvider(widget.task)); // Provider invaldieren, damit Homescreen neue Daten lädt
-    ref.invalidate(totalLoggedTimeProvider(widget.task.id));
-
-    if (!mounted) return;
-    Navigator.of(context).pop();
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Speichern der Executions: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      setState(() {
+        _entries = previousEntries;
+      });
+    } 
   }
 
   void _addEntry() {
@@ -150,6 +144,7 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
       taskId: widget.task.id,
       start: defaultStart,
       end: defaultEnd,
+      status: ExecutionEntryStatus.active,
       isDirty: true,
       isArchived: false,
       updatedAt: DateTime.now(),
@@ -159,10 +154,26 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
     });
   }
 
-  void _removeEntry(int index) {
-    setState(() {
-      _entries.removeAt(index);
-    });
+  Future<void> _removeEntry(int index) async {
+    final previousState = [..._entries];
+    
+    try {
+      final deleted = _entries[index].copyWith(
+        status: ExecutionEntryStatus.deleted,
+        updatedAt: DateTime.now(),
+        isDirty: true,
+      );
+
+      setState(() {
+        _entries[index] = deleted;
+      });
+    } catch (error, stackTrace) {
+      debugPrint('🛑 Fehler beim Soft Delete von ExecutionEntry: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      setState(() {
+        _entries = previousState;
+      });
+    }
   }
 
   @override
@@ -179,6 +190,8 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
       ],
     );
     
+    final visibleEntries = _entries.where((e) => e.status == ExecutionEntryStatus.active).toList();
+
     return AppScaffold(
       config: config,  
       child: _isLoading
@@ -187,9 +200,9 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
               children: [
                 Expanded(
                   child: ListView.builder(
-                    itemCount: _entries.length,
+                    itemCount: visibleEntries.length,
                     itemBuilder: (context, index) {
-                      final entry = _entries[index];
+                      final entry = visibleEntries[index];
                       return Card(
                         margin: EdgeInsets.symmetric(
                           horizontal: 16,

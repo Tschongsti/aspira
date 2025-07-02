@@ -84,7 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   
     final allFokus = ref.watch(userFokusActivitiesProvider);
     final fokusForToday = allFokus.where((fokus) =>
-      fokus.status == Status.active &&
+      fokus.status == TaskStatus.active &&
       !fokus.startDate.isAfter(selectedDate)
     ).toList();
 

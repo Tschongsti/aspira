@@ -23,13 +23,13 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final fokusTaetigkeiten = ref.watch(userFokusActivitiesProvider);
-    final hasInactive = fokusTaetigkeiten.any((item) => item.status == Status.inactive);
+    final hasInactive = fokusTaetigkeiten.any((item) => item.status == TaskStatus.inactive);
     final showInactive = ref.watch(showInactiveProvider);
     
     final filteredList = fokusTaetigkeiten.where((fokus) =>
       showInactive
-        ? fokus.status == Status.inactive
-        : fokus.status == Status.active
+        ? fokus.status == TaskStatus.inactive
+        : fokus.status == TaskStatus.active
     ).toList();
 
     final config = AppScreenConfig(

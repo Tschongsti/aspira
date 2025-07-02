@@ -13,11 +13,12 @@ final dailyExecutionProvider = FutureProvider.family
 
     final result = await db.query(
       'execution_entries',
-      where: 'taskId = ? AND start >= ? AND start <= ? AND isArchived = 0',
+      where: 'taskId = ? AND start >= ? AND start <= ? AND isArchived = 0 AND status = ?',
       whereArgs: [
         params.task.id,
         startOfDay.toIso8601String(),
         endOfDay.toIso8601String(),
+        ExecutionEntryStatus.active.name,
       ],
     );
 

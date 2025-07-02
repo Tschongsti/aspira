@@ -77,7 +77,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
         .map((row) => FokusTaetigkeit.fromLocalMap(row))
         .where((item) => 
           !item.isArchived &&
-          item.status != Status.deleted)
+          item.status != TaskStatus.deleted)
         .toList();
       state = fokusList;
     } catch (error, stackTrace) {
@@ -162,7 +162,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
       final db = await getDatabase();
            
       final deletedFokus = deleted.copyWith(
-        status: Status.deleted,
+        status: TaskStatus.deleted,
         isDirty: true,
         updatedAt: DateTime.now(),
       );
@@ -188,7 +188,7 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     
     try {
       final restored = restore.copyWith(
-        status: Status.active,
+        status: TaskStatus.active,
         updatedAt: DateTime.now(),
         isDirty: true,
       );

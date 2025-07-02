@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum Status { active, inactive, deleted }
+enum TaskStatus { active, inactive, deleted }
 enum Type { task, quantity, time }
 
 abstract class TrackableTask {
@@ -10,7 +10,7 @@ abstract class TrackableTask {
   final String description;
   final IconData iconData;
   final DateTime startDate;
-  final Status status;
+  final TaskStatus status;
   final Duration loggedTime;
   final bool isArchived;
 

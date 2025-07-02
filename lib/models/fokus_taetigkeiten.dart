@@ -23,13 +23,13 @@ class FokusTaetigkeit extends TrackableTask {
     DateTime? startDate,
     Duration? loggedTime,
     bool? isArchived,
-    Status? status,
+    TaskStatus? status,
     DateTime? updatedAt,
     bool? isDirty,
     }) : super( 
       id: id ?? uuid.v4(),
       startDate: startDate ?? DateTime.now(),
-      status: status ?? Status.active,
+      status: status ?? TaskStatus.active,
       loggedTime: loggedTime ?? Duration.zero,
       isArchived: isArchived ?? false,
       updatedAt: updatedAt ?? DateTime.now(),
@@ -92,9 +92,9 @@ class FokusTaetigkeit extends TrackableTask {
           )
         : Icons.favorite, // Fallback
       startDate: DateTime.parse(map['startDate']),
-      status: Status.values.firstWhere(
+      status: TaskStatus.values.firstWhere(
         (error) => error.name == map['status'],
-        orElse: () => Status.active,
+        orElse: () => TaskStatus.active,
       ),
       loggedTime: Duration(minutes: map['loggedTime'] ?? 0),
       isArchived: (map['isArchived'] ?? 0) == 1,
@@ -111,7 +111,7 @@ class FokusTaetigkeit extends TrackableTask {
     String? description,
     IconData? iconData,
     DateTime? startDate,
-    Status? status,
+    TaskStatus? status,
     Duration? loggedTime,
     bool? isArchived,
     DateTime? updatedAt,

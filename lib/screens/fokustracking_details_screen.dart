@@ -65,9 +65,9 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       weeklyGoal: widget.initialData!.weeklyGoal,
       startDate: widget.initialData!.startDate,
       loggedTime: widget.initialData!.loggedTime,
-      status: widget.initialData!.status == Status.active
-          ? Status.inactive
-          : Status.active,
+      status: widget.initialData!.status == TaskStatus.active
+          ? TaskStatus.inactive
+          : TaskStatus.active,
       updatedAt: DateTime.now(),
       isDirty: true,
     );
@@ -113,7 +113,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
       description: _description,
       iconData: _selectedIcon,
       weeklyGoal: Duration(minutes: _weeklyGoal),
-      status: widget.initialData?.status ?? Status.active,
+      status: widget.initialData?.status ?? TaskStatus.active,
       updatedAt: DateTime.now(),
       isDirty: true,
     );
@@ -146,7 +146,7 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
   @override
   Widget build(BuildContext context) {
     final isEditMode = widget.initialData != null;
-    final isInactive = widget.initialData?.status == Status.inactive;
+    final isInactive = widget.initialData?.status == TaskStatus.inactive;
     
     final config = AppScreenConfig(
       title: isEditMode
