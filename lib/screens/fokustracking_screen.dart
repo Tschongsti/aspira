@@ -58,11 +58,11 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
           )
         : FokustrackingList(
             fokusTaetigkeiten: filteredList,
-            onRemoveFokustaetigkeit: (fokus) {
+            onRemoveFokustaetigkeit: (deleted) {
               final notifier = ref.read(userFokusActivitiesProvider.notifier);
-              final index = fokusTaetigkeiten.indexOf(fokus);
+              final index = fokusTaetigkeiten.indexOf(deleted);
 
-              notifier.deleteFokusTaetigkeit(fokus.id);
+              notifier.deleteFokusTaetigkeit(deleted);
 
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!context.mounted) return;
@@ -77,7 +77,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
                     action: SnackBarAction(
                       label: 'Wiederherstellen',
                       onPressed: () {
-                        notifier.insertAt(index, fokus);
+                        notifier.insertAt(index, deleted);
                       },
                     ),
                   ),
