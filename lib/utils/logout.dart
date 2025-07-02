@@ -24,7 +24,7 @@ Future<void> logout(WidgetRef ref, BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     debugPrint('[Logout] FirebaseAuth signOut erfolgreich');
 
-    // 🧠 Warten bis Firebase wirklich null zurückgibt
+    // Warten bis Firebase wirklich null zurückgibt
     int retries = 0;
     while (FirebaseAuth.instance.currentUser != null && retries < 10) {
       debugPrint('[Logout] Warte auf currentUser == null...');

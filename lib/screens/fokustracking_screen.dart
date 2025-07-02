@@ -77,7 +77,7 @@ class _FokustrackingScreenState extends ConsumerState <FokustrackingScreen> {
                     action: SnackBarAction(
                       label: 'Wiederherstellen',
                       onPressed: () {
-                        notifier.insertAt(index, deleted);
+                        notifier.restoreFokusTaetigkeit(index, deleted);
                       },
                     ),
                   ),

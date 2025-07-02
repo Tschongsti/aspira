@@ -156,16 +156,26 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     }
   }
 
-  Future<void> deleteFokusTaetigkeit(String id) async {
+  Future<void> deleteFokusTaetigkeit(FokusTaetigkeit deleted) async {
     final previousState = [...state];
     try {
       final db = await getDatabase();
-      await db.delete(
-        'user_focusactivities',
-        where: 'id = ?',
-        whereArgs: [id],
+           
+      final deletedFokus = deleted.copyWith(
+        status: Status.deleted,
+        isDirty: true,
+        updatedAt: DateTime.now(),
       );
-      state = [...state]..removeWhere((item) => item.id == id);
+      
+      await db.update(
+        'user_focusactivities',
+        deletedFokus.toLocalMap(),
+        where: 'id = ?',
+        whereArgs: [deletedFokus.id],
+      );
+
+      state = [...state]..removeWhere((item) => item.id == deletedFokus.id);
+
     } catch (error, stackTrace) {
       debugPrint('🛑 Fehler beim Löschen: $error');
       debugPrintStack(stackTrace: stackTrace);
@@ -173,19 +183,28 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     }
   }
 
-  Future<void> insertAt(int index, FokusTaetigkeit fokus) async {
+  Future<void> restoreFokusTaetigkeit(int index, FokusTaetigkeit restore) async {
     final previousState = [...state];
+    
     try {
+      final restored = restore.copyWith(
+        status: Status.active,
+        updatedAt: DateTime.now(),
+        isDirty: true,
+      );
+            
       final db = await getDatabase();
-      await db.insert(
+      await db.update(
         'user_focusactivities',
-        fokus.toLocalMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
+        restored.toLocalMap(),
+        where: 'id = ?',
+        whereArgs: [restored.id],
       );
 
       final newList = [...state];
-      newList.insert(index, fokus);
+      newList.insert(index, restored);
       state = newList;
+      debugPrint('✅ Fokus-Tätigkeit wiederhergestellt: ${restored.id}');
     } catch (error, stackTrace) {
       debugPrint('🛑 Fehler beim Einfügen an Position: $error');
       debugPrintStack(stackTrace: stackTrace);
