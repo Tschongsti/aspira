@@ -8,8 +8,11 @@ final totalLoggedTimeProvider = FutureProvider.family<Duration, String>((ref, ta
 
   final data = await db.query(
     'execution_entries',
-    where: 'taskId = ? AND isArchived = 0',
-    whereArgs: [taskId],
+    where: 'taskId = ? AND isArchived = 0 AND status != ?',
+    whereArgs: [
+      taskId,
+      'deleted',
+    ],
   );
 
   final totalDuration = data

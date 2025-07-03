@@ -220,8 +220,11 @@ class _FokustrackingDetailsScreenState extends ConsumerState<FokustrackingDetail
                                 initialValue: _weeklyGoal.toString(),
                                 validator: (value) {
                                   final parsed = int.tryParse(value ?? '');
-                                  if (parsed == null || parsed <= 0) {
-                                    return 'Bitte gültige Zahl > 0';
+                                  if (parsed == null) {
+                                    return 'Bitte eine gültige Zahl eingeben';
+                                  }
+                                   if (parsed < 1 || parsed > 6720) {
+                                    return 'Wert muss zwischen 1 und 6720 Minuten liegen';
                                   }
                                   return null;
                                 },

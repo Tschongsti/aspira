@@ -73,14 +73,25 @@ class HomescreenTask extends StatelessWidget {
               ],
             ),
           ),
-          if (showEdit)
-            IconButton(
-              icon: const Icon(Icons.edit),
-              color: kAspiraGold,
-              onPressed: onEdit,
-            ),
-          if (onTapMainAction != null)
-            _buildMainActionButton(),
+          SizedBox(
+            width: 36,
+            height: 36,
+            child: showEdit
+                ? IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(Icons.edit),
+                    color: kAspiraGold,
+                    onPressed: onEdit,
+                  )
+                : const SizedBox.shrink(),
+          ),
+          SizedBox(
+            width: 48,
+            height: 48,
+            child: onTapMainAction != null
+                ? _buildMainActionButton()
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );

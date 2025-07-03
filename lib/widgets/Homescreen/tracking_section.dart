@@ -42,7 +42,7 @@ class TrackingSection extends ConsumerWidget {
             ? () {
                 final timerNotifier = ref.read(taskTimerProvider.notifier);
                 if (isRunning) {
-                  timerNotifier.pauseTimer(task.id, task, context);
+                  timerNotifier.pauseTimer(task.id, task, context, ref);
                 } else if (timer?.status == TaskTimerStatus.paused) {
                   timerNotifier.resumeTimer(task.id);
                 } else {

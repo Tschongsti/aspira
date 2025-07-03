@@ -1,3 +1,4 @@
+import 'package:aspira/providers/total_logged_time_provicder.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +46,7 @@ class TaskTimerNotifier extends StateNotifier<Map<String, TaskTimer>> {
     };
   }
 
-  Future<void> pauseTimer(String taskId, TrackableTask task, BuildContext context) async {
+  Future<void> pauseTimer(String taskId, TrackableTask task, BuildContext context, WidgetRef ref) async {
     final existing = state[taskId];
     if (existing == null || !existing.isRunning) return;
 
@@ -73,6 +74,9 @@ class TaskTimerNotifier extends StateNotifier<Map<String, TaskTimer>> {
         execution.toLocalMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+
+      ref.invalidate(totalLoggedTimeProvider(taskId));
+
       _currentExecutions.remove(taskId); // Aufräumen, um keinen unnötigen Speicher zu belegen
 
     } catch (error, stackTrace) {

@@ -14,11 +14,11 @@ final weeklySumProvider = FutureProvider.family
 
   final result = await db.query(
     'execution_entries',
-    where: 'taskId = ? AND start >= ? AND isArchived = 0 AND status = ?',
+    where: 'taskId = ? AND start >= ? AND isArchived = 0 AND status != ?',
     whereArgs: [
       task.id,
       startOfWeek.toIso8601String(),
-      ExecutionEntryStatus.active.name,
+      'deleted',
     ],
   );
 
