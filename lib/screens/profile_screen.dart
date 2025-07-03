@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:aspira/repositories/execution_entry_repo.dart';
 import 'package:aspira/repositories/focus_activities_repo.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -162,7 +163,26 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             const Spacer(),
-            // 🛠️ Dev-Reset-Button
+            // 🛠️ Dev-Buttons
+            const Text('App-Entwicklung (Entfernung nach Beta-Test)'),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  FirebaseCrashlytics.instance.crash(); // absichtlicher Crash
+
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color.fromARGB(255, 243, 2, 35),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 60),
+                ),
+                icon: const Icon(Icons.bug_report),
+                label: const Text('App Crash auslösen'),
+              ),
+            ),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(

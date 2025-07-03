@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/main.dart';
@@ -30,6 +32,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: '/splash',
+    observers: [
+      FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+    ],
     refreshListenable: routerNotifier,
     routes: [
       GoRoute(

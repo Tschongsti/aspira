@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
@@ -25,6 +27,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   await initializeDateFormatting('de_CH', null);
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

@@ -54,6 +54,8 @@ dependencies:
   youtube_player_flutter: ^9.1.1
   shared_preferences: ^2.5.3
   share_plus: ^11.0.0
+  firebase_analytics: ^11.5.1
+  firebase_crashlytics: ^4.3.8
 
 dev_dependencies:
   flutter_test:
