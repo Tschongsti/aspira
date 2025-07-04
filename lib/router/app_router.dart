@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -5,10 +7,10 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aspira/main.dart';
-import 'package:aspira/models/user_profile.dart';
 import 'package:aspira/models/fokus_taetigkeiten.dart';
 import 'package:aspira/models/trackable_task.dart';
-import 'package:aspira/providers/visited_screens_provider.dart';
+import 'package:aspira/models/user_profile.dart';
+import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/router/router_notifier.dart';
 import 'package:aspira/screens/start_screen.dart';
 import 'package:aspira/screens/home_screen.dart';
@@ -113,8 +115,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/profile/edit',
-        builder: (context, state) {      
-          final userProfile = state.extra as UserProfile;          
+        builder: (context, state) {
+          debugPrint("🛤️ /profile/edit Builder aufgerufen");
+          debugPrint("📦 Extra: ${state.extra}");
+          debugPrint("📍 Aktueller Stack: ${state.uri}");
+          
+          final userProfile = state.extra as UserProfile?;
+          if (userProfile == null) {
+            debugPrint("❌ Fehler: state.extra ist null beim Routing");
+            return const Scaffold(
+              body: Center(child: Text("Fehler beim Laden des Profils")),
+            );
+          }
           return ProfileEditScreen(userProfile: userProfile);
         },
       ),

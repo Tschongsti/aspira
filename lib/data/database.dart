@@ -60,15 +60,11 @@ Future<void> _createDb(Database db, int version) async {
       email TEXT NOT NULL,
       displayName TEXT,
       photoUrl TEXT,
+      visitedScreens TEXT,
       isDirty INTEGER NOT NULL,
       updatedAt TEXT NOT NULL
     );
   ''');
-  await db.execute('''
-    CREATE TABLE IF NOT EXISTS visited_screens(
-      screenId TEXT PRIMARY KEY
-    );
-  ''');  
 }
 
 Future<void> _runMigrations(Database db, int oldVersion, int newVersion) async {
@@ -83,6 +79,9 @@ Future<void> _runMigrations(Database db, int oldVersion, int newVersion) async {
     debugPrint('🛠️ Migration auf Version 3 gestartet');
     await db.execute('ALTER TABLE execution_entries ADD COLUMN status TEXT;');
     debugPrint('🧱 Spalte status in execution_entries ergänzt');
+    await db.execute('ALTER TABLE user_profile ADD COLUMN visitedScreens TEXT');
+    await db.execute('DROP TABLE IF EXISTS visited_screens');
+    debugPrint('🧱 Spalte visitedScreens in user_profile ergänzt und Tabelle visited_screens entfernt'); // visited_screens war bis Version 2 eine eigene Tabelle und wurde ab Version 3 ins user_profile integriert
     debugPrint('✅ Migration auf Version 3 abgeschlossen');
   }
 

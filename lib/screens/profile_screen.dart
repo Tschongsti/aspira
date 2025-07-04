@@ -30,7 +30,6 @@ class ProfileScreen extends ConsumerWidget {
   Future<void> _resetLocalDatabase(BuildContext context) async {
     final db = await getDatabase();
 
-    await db.delete('visited_screens');
     await db.delete('user_focusactivities');
     await db.delete('execution_entries');
     await db.delete('user_profile');
@@ -95,8 +94,12 @@ class ProfileScreen extends ConsumerWidget {
             );
 
             if (updatedProfile != null) {
+              debugPrint('🔁 Zurückgekommen mit updatedProfile: ${updatedProfile.displayName}');
               await ref.read(userProfileProvider.notifier).saveProfile(updatedProfile);
-              }
+            
+            } else {
+              debugPrint('📭 Zurückgekommen ohne Profil-Update');
+            }
           },
         ),
       ],

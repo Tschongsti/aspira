@@ -20,7 +20,7 @@ class UserProfileRepository {
       throw Exception('Kein Remote-Profil gefunden');
     }
 
-    final remote = UserProfile.fromMap(doc.data()!);
+    final remote = UserProfile.fromLocalMap(doc.data()!);
 
     final localResult = await db.query(
       'user_profile',
@@ -31,17 +31,17 @@ class UserProfileRepository {
 
     if (localResult.isEmpty) {
       await db.insert('user_profile', {
-        ...remote.toMap(),
+        ...remote.toLocalMap(),
         'isDirty': 0,
       });
       debugPrint('⬇️ UserProfile aus Firestore neu eingefügt: ${remote.email}');
     } else {
-      final local = UserProfile.fromMap(localResult.first);
+      final local = UserProfile.fromLocalMap(localResult.first);
       if (remote.updatedAt.isAfter(local.updatedAt)) {
         await db.update(
           'user_profile',
           {
-            ...remote.toMap(),
+            ...remote.toLocalMap(),
             'isDirty': 0,
           },
           where: 'id = ?',
@@ -70,8 +70,8 @@ class UserProfileRepository {
         return;
       }
 
-      final local = UserProfile.fromMap(result.first);
-      final dataForFirestore = local.toMap()..remove('isDirty');
+      final local = UserProfile.fromLocalMap(result.first);
+      final dataForFirestore = local.toLocalMap()..remove('isDirty');
 
       await firestore.collection('user_profiles').doc(userId).set(dataForFirestore);
       debugPrint('⬆️ UserProfile nach Firestore hochgeladen: ${local.email}');

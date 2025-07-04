@@ -33,7 +33,7 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
       );
 
       if (result.isNotEmpty) {
-        state = AsyncValue.data(UserProfile.fromMap(result.first));
+        state = AsyncValue.data(UserProfile.fromLocalMap(result.first));
       } else {
         state = const AsyncValue.data(null);
       }
@@ -59,7 +59,7 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
 
     await db.insert(
       'user_profile',
-      updated.toMap(),
+      updated.toLocalMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
@@ -88,7 +88,7 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
         debugPrint('[UserProfileNotifier] Remote-Profil NICHT gefunden → erstelle leeres Profil für UID: $id');
 
         final profile = UserProfile.empty(id, email);
-        await db.insert('user_profile', profile.toMap());
+        await db.insert('user_profile', profile.toLocalMap());
         state = AsyncValue.data(profile);
         return;
       }
@@ -101,9 +101,37 @@ class UserProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   }
 }
 
+Future<void> markScreenVisited(WidgetRef ref, String screenId) async {
+  try {
+    final notifier = ref.read(userProfileProvider.notifier);
+    final profileAsync = ref.read(userProfileProvider);
+
+    if (profileAsync is AsyncData && profileAsync.value != null) {
+      final profile = profileAsync.value!;
+      if (!profile.visitedScreens.contains(screenId)) {
+        final updatedScreens = [...profile.visitedScreens, screenId];
+        await notifier.saveProfile(profile.copyWith(visitedScreens: updatedScreens));
+      }
+    }
+  } catch (error, stack) {
+    debugPrint('🛑 Fehler beim Markieren als besucht: $error');
+    debugPrintStack(stackTrace: stack);
+  }
+}
+
 final userProfileProvider = StateNotifierProvider<UserProfileNotifier, AsyncValue<UserProfile?>>(
   (ref) => UserProfileNotifier(ref),
 );
+
+final visitedScreensProvider = Provider<Set<String>>((ref) {
+  final profileAsync = ref.watch(userProfileProvider);
+
+  return profileAsync.when(
+    data: (profile) => profile?.visitedScreens.toSet() ?? {},
+    loading: () => {},
+    error: (_, __) => {},
+  );
+});
 
 final firebaseUserProvider = Provider<User?>((ref) {
   return FirebaseAuth.instance.currentUser;

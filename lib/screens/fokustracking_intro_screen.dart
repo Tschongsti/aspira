@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import 'package:aspira/providers/visited_screens_provider.dart';
+import 'package:aspira/providers/user_profile_provider.dart';
 import 'package:aspira/utils/appscaffold.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 
@@ -13,10 +13,10 @@ class FokustrackingIntroScreen extends ConsumerStatefulWidget {
   const FokustrackingIntroScreen({super.key});
 
   @override
-  ConsumerState<FokustrackingIntroScreen> createState() => _State();
+  ConsumerState<FokustrackingIntroScreen> createState() => _FokusTrackingIntroScreenState();
 }
 
-class _State extends ConsumerState<FokustrackingIntroScreen> {
+class _FokusTrackingIntroScreenState extends ConsumerState<FokustrackingIntroScreen> {
   late YoutubePlayerController _ytController;
   bool _videoError = false;
 
@@ -100,9 +100,7 @@ class _State extends ConsumerState<FokustrackingIntroScreen> {
             // Call‑to‑Action
             ElevatedButton(
               onPressed: () async {
-                await ref
-                    .read(visitedScreensProvider.notifier)
-                    .markVisited('fokus');
+                await markScreenVisited(ref, 'fokus');
                 if (context.mounted) {
                   context.go('/ins-tun/fokus');
                 }
@@ -111,7 +109,7 @@ class _State extends ConsumerState<FokustrackingIntroScreen> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               ),
-              child: const Text('Erfasse deine Fokus‑Tätigkeiten'),
+              child: const Text('Erfasse deine Fokus-Tätigkeiten'),
             ),
           ],
         ),

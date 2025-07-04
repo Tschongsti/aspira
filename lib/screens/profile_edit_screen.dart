@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:go_router/go_router.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,7 +31,7 @@ class ProfileEditScreen extends ConsumerStatefulWidget {
 
 class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
-  late UserProfile? _userProfile;
+  late UserProfile _userProfile;
   File? _profileImage;
   bool _isSaving = false;
   // bool _isLoading = true;
@@ -37,6 +40,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   void initState() {
     super.initState();
     _userProfile = widget.userProfile;
+    debugPrint('✅ _userProfile initialisiert über Konstruktor');
   }
 
   Future<void> _pickImage() async {
@@ -77,6 +81,8 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
   Future<void> _saveProfile() async {
     
+    debugPrint('💾 Speichervorgang gestartet mit UserProfile: $_userProfile');
+
     setState(() {
       _isSaving = true;
     });
@@ -104,8 +110,9 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       try {
         await ref.putFile(_profileImage!);
         photoUrl = await ref.getDownloadURL();
-      } catch (error) {
+      } catch (error, stackTrace) {
         debugPrint('Bild-Upload fehlgeschlagen: $error');
+        debugPrint('StackTrace: $stackTrace');
       }
     }
 
@@ -116,13 +123,16 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       setState(() {
         _isSaving = false;
       });
+      debugPrint('🔙 Profil gespeichert, kehre zurück mit updatedProfile: $updatedProfile');
       Navigator.of(context).pop(updatedProfile);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    
+    final extra = GoRouterState.of(context).extra;
+    debugPrint('📍 Build gestartet – extra: $extra');
+
     final config = AppScreenConfig(
       title: 'Profil bearbeiten',
       appBarActions: [
