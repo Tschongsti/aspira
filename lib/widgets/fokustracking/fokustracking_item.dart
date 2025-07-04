@@ -75,7 +75,7 @@ final FokusTaetigkeit fokusTaetigkeiten;
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Fokuszeit:'),
+                          const Text('Fokuszeit total:'),
                           Text(loggedTimeDisplay),
                         ],
                       ),

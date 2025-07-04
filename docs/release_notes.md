@@ -47,3 +47,21 @@ Version 0.3.3
 🐞 Fehlerbehebungen:
 - Vermeidung von automatischer Sicherung von Backup-Daten bei De-Installation der App
 - Logging von User-Profil und Fokus-Tätigkeiten beim Start der App
+
+Version 0.4.0
+
+🚀 Neue Funktionen:
+- Online-Synchonisation mit Firebase (Geräteübergreifende Nutzung)
+- Firebase Analytics & Crashlytics eingebunden
+
+🎁 Verbesserungen:
+- Aspira AppIcon beim Laden der App und App-Switching
+- Verbesserte Input Validierung Wochenziel
+- Einheitliches Layout der Fokustätigkeiten auf HomeScreen
+
+🐞 Fehlerbehebungen:
+- Korrekte Anzeige der gesamten Fokuszeit im Screen Fokus Tätigkeit
+
+💡 Known Issues:
+- DarkMode nicht unterstützt
+- Dev-Optionen im Profile Screen für App-Entwicklung

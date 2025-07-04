@@ -99,7 +99,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
     _formKey.currentState!.save();
 
-    String? photoUrl = _userProfile!.photoUrl;
+    String? photoUrl = _userProfile.photoUrl;
     if (_profileImage != null) {
       final ref = FirebaseStorage.instance
         .ref()
@@ -116,7 +116,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       }
     }
 
-    final updatedProfile = _userProfile!.copyWith(photoUrl: photoUrl);    
+    final updatedProfile = _userProfile.copyWith(photoUrl: photoUrl);    
     await ref.read(userProfileProvider.notifier).saveProfile(updatedProfile);
     
     if (mounted) {
@@ -156,7 +156,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     //  return const Scaffold(body: Center(child: CircularProgressIndicator()));
     // }
 
-    final validPhotoUrl = _userProfile?.photoUrl != null && _userProfile!.photoUrl!.startsWith('http');
+    final validPhotoUrl = _userProfile.photoUrl != null && _userProfile.photoUrl!.startsWith('http');
     
     return PopScope<Object?>(
       canPop: !_isSaving, // Pop wird blockiert, wenn _isSaving == true
@@ -184,7 +184,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   backgroundImage: _profileImage != null 
                     ? FileImage(_profileImage!)
                     : validPhotoUrl
-                      ? NetworkImage(_userProfile!.photoUrl!) as ImageProvider
+                      ? NetworkImage(_userProfile.photoUrl!) as ImageProvider
                       : null,
                   child: _profileImage == null && !validPhotoUrl
                       ? const Icon(Icons.camera_alt, size: 32)
@@ -198,7 +198,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   decoration: const InputDecoration(
                     labelText: 'Benutzername',
                   ),
-                  initialValue: _userProfile?.displayName ?? "",
+                  initialValue: _userProfile.displayName ?? "",
                   maxLength: 25,
                   validator: (value) {
                     if (value == null || value.trim().length < 3) {
@@ -207,7 +207,7 @@ class _UserProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     return null;
                   },
                   onSaved: (value) {
-                    _userProfile = _userProfile!.copyWith(displayName: value!.trim());
+                    _userProfile = _userProfile.copyWith(displayName: value!.trim());
                   },
                 ),
               ),
