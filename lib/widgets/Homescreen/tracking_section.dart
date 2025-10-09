@@ -11,6 +11,7 @@ import 'package:aspira/providers/task_timer_provider.dart';
 import 'package:aspira/providers/timer_ticker_provider.dart';
 import 'package:aspira/providers/weekly_sum_provider.dart';
 import 'package:aspira/providers/daily_execution_provider.dart';
+import 'package:aspira/utils/date_utils.dart';
 import 'package:aspira/widgets/Homescreen/homescreen_task.dart';
 
 class TrackingSection extends ConsumerWidget {
@@ -95,9 +96,11 @@ class TrackingSection extends ConsumerWidget {
     Duration elapsed,
   ) {
     if (task is FokusTaetigkeit) {
-      final asyncWeekly = ref.watch(weeklySumProvider(task));
+      final (weekStart, weekEnd) = weekWindow(selectedDate);
+      final asyncWeekly = ref.watch(weeklySumProvider((taskId: task.id, weekStart: weekStart)));
       final weeklySum = asyncWeekly.value ?? Duration.zero;
-      return weeklySum + elapsed;
+      final addWeeklyElapsed = isSameWeek(selectedDate, DateTime.now());
+      return weeklySum + (addWeeklyElapsed ? elapsed : Duration.zero);
     } else {
       final startOfDay = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
       final asyncDaily = ref.watch(
@@ -107,7 +110,8 @@ class TrackingSection extends ConsumerWidget {
           ?.map((entry) => entry.duration)
           .fold(Duration.zero, (a, b) => a + b) ?? Duration.zero;
 
-      return dailySum + elapsed;
+      final addDailyElapsed = DateUtils.isSameDay(selectedDate, DateTime.now());
+      return dailySum + (addDailyElapsed ? elapsed : Duration.zero);
     }
   }
 

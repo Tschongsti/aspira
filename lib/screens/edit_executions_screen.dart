@@ -14,6 +14,7 @@ import 'package:aspira/providers/weekly_sum_provider.dart';
 import 'package:aspira/providers/total_logged_time_provicder.dart';
 import 'package:aspira/utils/appscreenconfig.dart';
 import 'package:aspira/utils/appscaffold.dart';
+import 'package:aspira/utils/date_utils.dart';
 
 class EditExecutionsScreen extends ConsumerStatefulWidget {
   final TrackableTask task;
@@ -121,7 +122,9 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
 
       await batch.commit(noResult: true);
       
-      ref.invalidate(weeklySumProvider(widget.task)); // Provider invaldieren, damit Homescreen neue Daten lädt
+      final (weekStart, _) = weekWindow(widget.selectedDate);
+
+      ref.invalidate(weeklySumProvider((taskId: widget.task.id, weekStart: weekStart))); // Provider invaldieren, damit Homescreen neue Daten lädt
       ref.invalidate(totalLoggedTimeProvider(widget.task.id));
 
       if (!mounted) return;

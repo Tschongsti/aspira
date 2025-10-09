@@ -2,22 +2,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aspira/data/database.dart';
 import 'package:aspira/models/execution_entry.dart';
-import 'package:aspira/models/trackable_task.dart';
 
+typedef WeeklyInput = ({String taskId, DateTime weekStart});
 
 final weeklySumProvider = FutureProvider.family
-    .autoDispose<Duration, TrackableTask>((ref, task) async {
+    .autoDispose<Duration, WeeklyInput>((ref, input) async {
   final db = await getDatabase();
-  final now = DateTime.now();
-  final startOfWeek = DateTime(now.year, now.month, now.day)
-      .subtract(Duration(days: now.weekday - 1)); // Montag 00:00
-
+  final start = DateTime(input.weekStart.year, input.weekStart.month, input.weekStart.day);
+  final end = start.add(const Duration(days: 7)); 
+  
   final result = await db.query(
     'execution_entries',
-    where: 'taskId = ? AND start >= ? AND isArchived = 0 AND status != ?',
+    where: 'taskId = ? AND start >= ? AND start < ? AND isArchived = 0 AND status != ?',
     whereArgs: [
-      task.id,
-      startOfWeek.toIso8601String(),
+      input.taskId,
+      start.toIso8601String(),
+      end.toIso8601String(),
       'deleted',
     ],
   );
