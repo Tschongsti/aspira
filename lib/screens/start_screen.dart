@@ -199,7 +199,7 @@ class _StartScreenState extends ConsumerState<StartScreen> {
                               child: Text (
                                 _isLogin
                                   ? 'Einloggen'
-                                  : 'Anmelden',
+                                  : 'Erstellen',
                               ),
                             ),
                           ),

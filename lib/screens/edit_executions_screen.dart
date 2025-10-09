@@ -196,57 +196,63 @@ class _EditExecutionsScreenState extends ConsumerState<EditExecutionsScreen> {
       config: config,  
       child: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: visibleEntries.length,
-                    itemBuilder: (context, index) {
-                      final entry = visibleEntries[index];
-                      return Card(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
+          : SafeArea(
+              top: false, // bereits durch AppBar geschützt
+              bottom: true,
+              child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(
+                          bottom: 96,
                         ),
-                        child: Padding (
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox (width: 24),
-                                TextButton(
-                                  onPressed: () => _pickTime(index, true),
-                                  child: Text('Start: ${_formatTime(entry.start)}'),
-                                ),
-                                SizedBox (width: 12),
-                                TextButton(
-                                  onPressed: () => _pickTime(index, false),
-                                  child: Text('Ende: ${_formatTime(entry.end)}'),
-                                ),
-                                Spacer(),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.black),
-                                  onPressed: () => _removeEntry(index),
-                                ),
-                                SizedBox (width: 24),
-                              ],
+                        itemCount: visibleEntries.length,
+                        itemBuilder: (context, index) {
+                          final entry = visibleEntries[index];
+                          return Card(
+                            margin: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
                             ),
-                        ),
-                      );
-                    },
-                  ),
+                            child: Padding (
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox (width: 24),
+                                    TextButton(
+                                      onPressed: () => _pickTime(index, true),
+                                      child: Text('Start: ${_formatTime(entry.start)}'),
+                                    ),
+                                    SizedBox (width: 12),
+                                    TextButton(
+                                      onPressed: () => _pickTime(index, false),
+                                      child: Text('Ende: ${_formatTime(entry.end)}'),
+                                    ),
+                                    const Spacer(),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.black),
+                                      onPressed: () => _removeEntry(index),
+                                    ),
+                                    SizedBox (width: 24),
+                                  ],
+                                ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12),
+                      child: ElevatedButton.icon(
+                        onPressed: _addEntry,
+                        icon: const Icon(Icons.add),
+                        label: const Text('Neue Ausführung hinzufügen'),
+                      ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12),
-                  child: ElevatedButton.icon(
-                    onPressed: _addEntry,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Neue Ausführung hinzufügen'),
-                  ),
-                ),
-                SizedBox(height: 16),
-              ],
-            ),
+          ),
     );
   }
 }
