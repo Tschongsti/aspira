@@ -29,7 +29,7 @@ class HomescreenTask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showEdit = loggedTime > Duration.zero && onEdit != null;
+    final showEdit = onEdit != null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: kPaddingSmall),
