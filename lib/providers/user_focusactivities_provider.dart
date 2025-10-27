@@ -117,41 +117,68 @@ class UserFokusActivitiesNotifier extends StateNotifier<List<FokusTaetigkeit>> {
     try {
       final db = await getDatabase();
 
-      if (versionGoal) {
-        final timestamp = DateTime.now().toIso8601String();
-        final archived = updated.copyWith(
-          id: '${updated.id}_$timestamp',
-          isArchived: true,
+      await db.transaction((txn) async {
+
+        // 1) Aktuellen Stand holen (für korrektes Archiv)
+        FokusTaetigkeit? current;
+        final i = state.indexWhere((t) => t.id == updated.id);
+        if (i != -1) {
+          current = state[i];
+        } else {
+          final rows = await txn.query(
+            'user_focusactivities',
+            where: 'id = ?',
+            whereArgs: [updated.id],
+            limit: 1,
+          );
+          if (rows.isNotEmpty) current = FokusTaetigkeit.fromLocalMap(rows.first);
+        }
+
+        // 🔎 Mini-Sanity-Check #1 – direkt nach dem Laden des alten Stands
+        debugPrint(
+          '[updateFokusTaetigkeit] id=${updated.id} | '
+          'OLD weeklyGoal=${current?.weeklyGoal.inMinutes}min | '
+          'NEW weeklyGoal=${updated.weeklyGoal.inMinutes}min | '
+          'versionGoal=$versionGoal'
+        );
+
+        // 2) Falls WeeklyGoal geändert → alte Version archivieren (alter Stand!)
+        if (versionGoal && current != null) {
+          final ts = DateTime.now().toIso8601String();
+          final archived = current.copyWith(
+            id: '${current.id}_$ts',
+            isArchived: true,
+            updatedAt: DateTime.now(),
+            isDirty: true,
+          );
+          await txn.insert('user_focusactivities', archived.toLocalMap());
+        }
+
+        // 3) Aktuellen Datensatz updaten (mit neuen Feldern)
+        final updatedWithMeta = updated.copyWith(
           updatedAt: DateTime.now(),
           isDirty: true,
         );
+        await txn.update(
+          'user_focusactivities',
+          updatedWithMeta.toLocalMap(),
+          where: 'id = ?',
+          whereArgs: [updated.id],
+        );
 
-        await db.insert('user_focusactivities', archived.toLocalMap());
-        debugPrint('📦 Alte Version archiviert: ${archived.id}');
-      }
+        // 4) State synchron halten
+        if (i != -1) {
+          final list = [...state];
+          list[i] = updatedWithMeta;
+          state = list;
+        } else {
+          state = [updatedWithMeta, ...state];
+        }
+      });
 
-      final updatedWithMeta = updated.copyWith(
-        updatedAt: DateTime.now(),
-        isDirty: true,
-      );
-
-      await db.update(
-        'user_focusactivities',
-        updatedWithMeta.toLocalMap(),
-        where: 'id = ?',
-        whereArgs: [updated.id],
-      );
-
-      final index = state.indexWhere((item) => item.id == updated.id);
-      if (index != -1) {
-        final newList = [...state];
-        newList[index] = updatedWithMeta;
-        state = newList;
-      }
-
-    } catch (error, stackTrace) {
-      debugPrint('🛑 Fehler beim Update: $error');
-      debugPrintStack(stackTrace: stackTrace);
+    } catch (e, st) {
+      debugPrint('🛑 Fehler updateFokusTaetigkeit: $e');
+      debugPrintStack(stackTrace: st);
       state = previousState;
     }
   }
